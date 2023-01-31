@@ -1,0 +1,35 @@
+# GUI Requirements
+
+This is a desktop application.
+
+- A top-level menu bar that lists major functions, and indicates the hotkeys for each feature (e.g. File, Edit, View menu and submenus).
+- Hotkeys/keyboard shortcuts for major functionality.
+- Window resizing, so that the user can resize and reposition the application. You should save the window size and position on exit, and restore 	that size and position when they relaunch it.
+- Minimize/mazimize buttons function as expected.
+- Undo-redo support for actions in the user interface.
+- Cut-copy-paste text.
+
+- Support basic Markdown syntax, including headings, bold, italics, and so on. This includes syntax highlighting for these elements, and hotkeys to apply formatting (e.g. CMD-B to bold selected text).
+- Users should be able to open an existing markdown file (extensions .md or .markdown), close the current file, save or save-as with appropriate dialogs.
+- It should be possible to have multiple markdown files open simultaneously (in different windows or different tabs).
+- You should support light and dark themes, and the user should be able to set their preference in a Settings dialog. These settings should persist across sections and files.
+- Provide two view modes: raw markdown syntax (as above), or formatted text.
+- Save application settings in the cloud so that they are preserved across sessions.
+
+# Service Requirements
+
+- Build a web service so user's data can be shared across multiple systems.
+- A user should be able to launch multiple instances of the application, and have the instances load and use this remote data.
+- Application should communicate with the web service using HTTP protocol.
+- Data should be saved so that if the web service is stopped and restarted, the data will persist.
+
+
+# Additional Feature Requirements
+
+- Add themes! Dark, Light, Solarized etc.
+- Stylize the toolbars e.g. a fancy VS Code style, expanding toolbar.
+- Support editing both in raw markdown or formatted text (similar to Typora, where you can mode-switch but edit in either mode).
+- Save files in the cloud, instead of just settings. [ed. this would likely mean the ability to import files, browse, and delete from the cloud as well].
+- Open multiple files in tabs instead of windows.
+- Export as HTML.
+- Export as PDF.
