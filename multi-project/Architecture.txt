@@ -1,0 +1,21 @@
+Project Tracking and Team collaboration: 
+	- Gitlab: https://git.uwaterloo.ca/sw4wang/cs346
+
+Main Programming Language:
+	- Kotlin
+
+GUI:
+	- JavaFX
+	- Local data storage: JSON Format
+
+Cloud/web Services:
+	- Spring boot
+	- Docker to containerize the service
+	- Microsoft Azure to host the service
+	- SQLite to store data remotely
+
+Unit Testing:
+	- JUnit
+
+Building the Application:
+	- Gradle
