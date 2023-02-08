@@ -1,9 +1,0 @@
-None of have much expierence with JavaFTX or front end
-To mitigate we will spend a little bit extra time + manpower to make sure that runs smoothly
-
-Some of us have expierence with cloud services but not with Azur in particular
-To mitigate we will spend a little bit extra time
-
-Data persistence between local and remote saves
-Constant syncing between front end and back end, make sure the file format/architeture is simple
-
