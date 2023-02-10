@@ -3,24 +3,43 @@ package net.codebot.application
 import javafx.application.Application
 import javafx.geometry.Insets
 import javafx.scene.Scene
+import javafx.scene.control.Button
+import javafx.scene.control.Label
+import javafx.scene.control.ScrollPane
+import javafx.scene.control.ToolBar
+import javafx.scene.control.TextArea
+import javafx.scene.layout.BorderPane
+import javafx.scene.layout.HBox
+import javafx.scene.layout.StackPane
+import javafx.scene.layout.VBox
 import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.scene.text.Font
 import javafx.scene.text.Text
 import javafx.stage.Stage
-
+import net.codebot.shared.SysInfo
+import javafx.scene.control.Tooltip
+import javafx.scene.image.ImageView
 
 class Main : Application() {
     override fun start(stage: Stage) {
-        // code for toolbar
+        val bold = Button("B")
+        val italics = Button("I")
+        val heading = Button("H")
+        val strikethrough = Button("S")
+
+
         val toolbar =ToolBar(
             Button("New"),
             Button("Open"),
-            Button("Save")
+            Button("Save"),
+            bold,
+            italics,
+            heading,
+            strikethrough
         )
 
-        // code for center area
         val text = TextArea()
         text.isWrapText = true
         text.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, " +
@@ -51,6 +70,45 @@ class Main : Application() {
         display_text.isEditable = false
         val right = HBox(display_text)
         right.prefWidth = 750.0
+
+        bold.setOnMouseClicked {
+            var currentHighlight = text.selectedText
+            if(currentHighlight == ""){
+                currentHighlight = "strong text"
+            }
+            //text.insert("**" + currentHighlight + "**", text.getCaretPosition());
+            text.replaceSelection("**"+currentHighlight+"**");
+        }
+        italics.setOnMouseClicked {
+            var currentHighlight = text.selectedText
+            if(currentHighlight == ""){
+                currentHighlight = "emphasized text"
+            }
+            //text.insert("**" + currentHighlight + "**", text.getCaretPosition());
+            text.replaceSelection("*"+currentHighlight+"*");
+        }
+
+        heading.setOnMouseClicked {
+            var currentHighlight = text.selectedText
+            if(currentHighlight == ""){
+                currentHighlight = "Heading"
+            }
+            //text.insert("**" + currentHighlight + "**", text.getCaretPosition());
+            text.replaceSelection("##"+currentHighlight);
+        }
+        strikethrough.setOnMouseClicked {
+            var currentHighlight = text.selectedText
+            if(currentHighlight == ""){
+                currentHighlight = "strikethrough text"
+            }
+            //text.insert("**" + currentHighlight + "**", text.getCaretPosition());
+            text.replaceSelection("~~"+currentHighlight+"~~");
+        }
+
+        bold.setTooltip( Tooltip("Bold - Meta+Shift+B"))
+        italics.setTooltip( Tooltip("Italic - Meta+Shift+I"))
+        heading.setTooltip( Tooltip("Heading - Meta+Shift+H"))
+        strikethrough.setTooltip( Tooltip("Strikethrough - Meta+Shift+S"))
 
         val border = BorderPane()
         border.top = toolbar
