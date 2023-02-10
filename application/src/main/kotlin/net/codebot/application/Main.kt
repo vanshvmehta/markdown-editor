@@ -43,10 +43,14 @@ class Main : Application() {
         val left = VBox(Text("Left Pane"))
 
         // code for right pane
-        val right = VBox(Text("Right Pane"))
+        val display_text = TextArea()
+        display_text.isWrapText = true
+        display_text.text = "Uneditable Text"
+        display_text.font = Font("Helvetica", 12.0)
+        display_text.prefColumnCount = 200
+        display_text.isEditable = false
+        val right = HBox(display_text)
         right.prefWidth = 750.0
-        right.setStyle("-fx-background-color: #FFA500;")
-        right.setBackground(Background(BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)))
 
         val border = BorderPane()
         border.top = toolbar
