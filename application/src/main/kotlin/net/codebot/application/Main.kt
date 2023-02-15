@@ -2,17 +2,13 @@ package net.codebot.application
 
 import javafx.application.Application
 import javafx.scene.Scene
-import javafx.scene.control.Button
-import javafx.scene.control.Label
-import javafx.scene.control.ToolBar
-import javafx.scene.control.TextArea
+import javafx.scene.control.*
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
 import javafx.scene.text.Text
 import javafx.stage.Stage
-import javafx.scene.control.Tooltip
 
 class Main : Application() {
     override fun start(stage: Stage) {
@@ -24,9 +20,7 @@ class Main : Application() {
 
 
         val toolbar = ToolBar(
-            Button("New"),
-            Button("Open"),
-            Button("Save"),
+
             bold,
             italics,
             heading,
@@ -109,7 +103,35 @@ class Main : Application() {
         compileMd.setTooltip( Tooltip("Compile Markdown - Meta+R"))
 
         val border = BorderPane()
-        border.top = toolbar
+
+        val topContainer = VBox()
+        val mainMenu = MenuBar()
+
+        val file = Menu("File")
+        val openFile = MenuItem("Open File")
+        val new = MenuItem("New")
+        val save = MenuItem("Save")
+        val exitApp = MenuItem("Exit")
+        file.items.addAll(openFile, new, save, exitApp)
+
+        val edit = Menu("Edit")
+        val cut = MenuItem("Cut")
+        val copy = MenuItem("Copy")
+        val paste = MenuItem("Paste")
+        edit.items.addAll(cut, copy, paste)
+
+        //Create SubMenu Help.
+        //Create SubMenu Help.
+        val view = Menu("View")
+        val themes = MenuItem("Themes")
+        view.items.add(themes)
+
+        mainMenu.getMenus().addAll(file, edit);
+
+        topContainer.getChildren().add(mainMenu);
+        topContainer.getChildren().add(toolbar);
+
+        border.top = topContainer
         border.center = center
         border.bottom = status
         border.left = left
