@@ -52,7 +52,9 @@ class Main : Application() {
         val status = HBox(label)
 
         // code for left pane
-        val left = VBox(Text("Left Pane"))
+        val tree = FolderView().build()
+        val left = tree
+        left.prefWidth = 250.0
 
         // code for right pane
         val display_text = TextArea()
@@ -62,7 +64,7 @@ class Main : Application() {
         display_text.prefColumnCount = 200
         display_text.isEditable = false
         val right = HBox(display_text)
-        right.prefWidth = 750.0
+        right.prefWidth = 650.0
 
         bold.setOnMouseClicked {
             var currentHighlight = text.selectedText
@@ -153,7 +155,7 @@ class Main : Application() {
             } catch (e: FileNotFoundException) {
                 e.printStackTrace();
             }
-
+            border.left = FolderView().build(selectedFile.parentFile.absolutePath)
         }
 
         border.top = topContainer
