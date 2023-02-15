@@ -1,6 +1,7 @@
 package net.codebot.application
 
 import javafx.application.Application
+import javafx.event.EventHandler
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.layout.BorderPane
@@ -8,7 +9,11 @@ import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
 import javafx.scene.text.Text
+import javafx.stage.FileChooser
 import javafx.stage.Stage
+import java.io.File
+import java.io.FileNotFoundException
+import java.util.*
 
 class Main : Application() {
     override fun start(stage: Stage) {
@@ -130,6 +135,26 @@ class Main : Application() {
 
         topContainer.getChildren().add(mainMenu);
         topContainer.getChildren().add(toolbar);
+
+        //OpenFile function
+        openFile.onAction = EventHandler {
+            val filechooser = FileChooser();
+            val file = File("C:\\Users");
+            filechooser.setTitle("Open my file");
+            filechooser.setInitialDirectory(file);
+
+            val selectedFile = filechooser.showOpenDialog(stage);
+            try {
+                val scanner = Scanner(selectedFile);
+                text.clear()
+                while (scanner.hasNextLine()) {
+                    text.appendText(scanner.nextLine() + "\n");
+                }
+            } catch (e: FileNotFoundException) {
+                e.printStackTrace();
+            }
+
+        }
 
         border.top = topContainer
         border.center = center
