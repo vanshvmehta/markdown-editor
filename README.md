@@ -12,3 +12,14 @@ Architecture: // Link to archtecture.txt
 ## Issues and Milestones
 // To be filled in future sprints
 
+## Releases
+// 2/16/2023
+// Version : 1.0.0
+Baseline functionality
+- A resizable application
+- Toolbars
+- Buttons for basic Markdown syntax bold, italics etc.
+- Text pane to type
+- Display pane and compile button
+- Ability to open .txt files
+- File directory pane
