@@ -22,4 +22,5 @@ Baseline functionality
 - Text pane to type
 - Display pane and compile button
 - Ability to open .txt files
+- Ability to save .txt files
 - File directory pane
