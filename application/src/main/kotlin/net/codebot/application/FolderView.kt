@@ -13,12 +13,13 @@ class FolderView {
         folder_img.fitWidth = 20.0
         folder_img.fitHeight = 20.0
         val folderIcon: Node = folder_img
-        val rootItem = TreeItem<Any?>("Inbox", folderIcon)
+        val rootItem = TreeItem<Any?>(pathname, folderIcon)
         rootItem.isExpanded = true
         File(pathname).walk(FileWalkDirection.BOTTOM_UP).forEach {
             val item = TreeItem<Any?>(it)
             rootItem.children.add(item)
         }
+        rootItem.children.removeLast()
         return StackPane(TreeView<Any?>(rootItem))
     }
 }

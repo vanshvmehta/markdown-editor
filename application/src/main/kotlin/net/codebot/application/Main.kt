@@ -36,13 +36,18 @@ class Main : Application() {
 
         val text = TextArea()
         text.isWrapText = true
-        text.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, " +
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, " +
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, " +
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, " +
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, " +
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, " +
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        text.text = "## Releases\n" +
+                "// 2/16/2023\n" +
+                "// Version : 1.0.0\n" +
+                "Baseline functionality\n" +
+                "- A resizable application\n" +
+                "- Toolbars\n" +
+                "- Buttons for basic Markdown syntax bold, italics etc.\n" +
+                "- Text pane to type\n" +
+                "- Display pane and compile button\n" +
+                "- Ability to open .txt files\n" +
+                "- Ability to save .txt files\n" +
+                "- File directory pane"
         text.font = Font("Helvetica", 12.0)
         text.prefColumnCount = 200
         val center = HBox(text)
@@ -55,17 +60,17 @@ class Main : Application() {
         // code for left pane
         val tree = FolderView().build()
         val left = tree
-        left.prefWidth = 250.0
+        left.prefWidth = 200.0
 
         // code for right pane
         val display_text = TextArea()
         display_text.isWrapText = true
-        display_text.text = "Uneditable Text"
+        display_text.text = "Compile text goes here!"
         display_text.font = Font("Helvetica", 12.0)
-        display_text.prefColumnCount = 200
+        display_text.prefColumnCount = 100
         display_text.isEditable = false
         val right = HBox(display_text)
-        right.prefWidth = 650.0
+        right.prefWidth = 600.0
 
         bold.setOnMouseClicked {
             var currentHighlight = text.selectedText
