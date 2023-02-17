@@ -13,6 +13,7 @@ import javafx.stage.FileChooser
 import javafx.stage.Stage
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.PrintWriter
 import java.util.*
 
 class Main : Application() {
@@ -117,9 +118,9 @@ class Main : Application() {
         val file = Menu("File")
         val openFile = MenuItem("Open File")
         val new = MenuItem("New")
-        val save = MenuItem("Save")
+        val saveFile = MenuItem("Save")
         val exitApp = MenuItem("Exit")
-        file.items.addAll(openFile, new, save, exitApp)
+        file.items.addAll(openFile, new, saveFile, exitApp)
 
         val edit = Menu("Edit")
         val cut = MenuItem("Cut")
@@ -156,6 +157,20 @@ class Main : Application() {
                 e.printStackTrace();
             }
             border.left = FolderView().build(selectedFile.parentFile.absolutePath)
+        }
+
+        //SaveFile function
+        saveFile.onAction = EventHandler {
+            val file = FileChooser().showSaveDialog(Stage());
+            if (file != null) {
+                try {
+                    val printWriter = PrintWriter(file);
+                    printWriter.write(text.text);
+                    printWriter.close();
+                } catch (e: FileNotFoundException) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         border.top = topContainer
