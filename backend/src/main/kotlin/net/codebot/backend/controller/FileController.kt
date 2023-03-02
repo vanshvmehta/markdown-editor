@@ -8,13 +8,12 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/file")
 class FileController(val service: FileService) {
     @GetMapping
-    fun getFiles(): String {
-        service.getFiles()
-        return "Hello"
+    fun getFiles(): List<FileDTO>? {
+        return service.getFiles()
     }
 
     @PostMapping
-    fun postFile(@RequestBody request: FileDTO): FileDTO {
+    fun postFile(@RequestBody request: FileDTO): MutableMap<String, String> {
         return service.postFiles(request)
     }
 }
