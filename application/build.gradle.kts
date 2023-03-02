@@ -35,6 +35,7 @@ tasks.withType<KotlinCompile> {
 application {
     mainModule.set("application")
     mainClass.set("net.codebot.application.Main")
+
 }
 
 javafx {
