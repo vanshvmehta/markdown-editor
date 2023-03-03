@@ -48,9 +48,16 @@ class Main : Application() {
         val center = HBox(text)
         center.minWidth = 400.0
 
+
+
         // code for status bar (bottom pane)
-        val label = Label("Test for Status Bar")
+        val label = Label("")
         val status = HBox(label)
+
+        text.textProperty().addListener { observable, oldValue, newValue ->
+            val newlines = newValue.split("\n").size
+            val spaces = newValue.split("\\s+".toRegex()).size
+            label.text = "Character count: " + newValue.length + "   Line Count: " + newlines + "   Word Count: " + spaces  }
 
         // code for left pane
         val tree = FolderView().build()
