@@ -15,6 +15,8 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintWriter
 import java.util.*
+import javafx.scene.web.WebView;
+import javafx.scene.web.*
 
 class Main : Application() {
     override fun start(stage: Stage) {
@@ -65,14 +67,16 @@ class Main : Application() {
         left.prefWidth = 250.0
 
         // code for right pane
+        val webView = WebView()
         val display_text = TextArea()
         display_text.isWrapText = true
         display_text.text = "Uneditable Text"
         display_text.font = Font("Helvetica", 12.0)
         display_text.prefColumnCount = 200
         display_text.isEditable = false
-        val right = HBox(display_text)
-        right.prefWidth = 650.0
+        val right = webView
+        // val right = HBox(display_text)
+        //right.prefWidth = 650.0
 
         bold.setOnMouseClicked {
             var currentHighlight = text.selectedText
@@ -108,7 +112,7 @@ class Main : Application() {
             text.replaceSelection("~~" + currentHighlight + "~~");
         }
         compileMd.setOnMouseClicked {
-            display_text.text = text.text
+            webView.getEngine().loadContent(text.text);
         }
 
         bold.setTooltip( Tooltip("Bold - Meta+Shift+B"))
