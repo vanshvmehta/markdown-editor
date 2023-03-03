@@ -142,10 +142,8 @@ class Main : Application() {
         //OpenFile function
         openFile.onAction = EventHandler {
             val filechooser = FileChooser();
-            val file = File("C:\\Users");
             filechooser.setTitle("Open my file");
-            filechooser.setInitialDirectory(file);
-
+            filechooser.setInitialDirectory(File(System.getProperty("user.home")));
             val selectedFile = filechooser.showOpenDialog(stage);
             try {
                 val scanner = Scanner(selectedFile);
