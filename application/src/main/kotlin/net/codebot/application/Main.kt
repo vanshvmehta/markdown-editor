@@ -1,5 +1,13 @@
 package net.codebot.application
 
+import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension
+import com.vladsch.flexmark.ext.gitlab.GitLabExtension
+import com.vladsch.flexmark.ext.tables.TablesExtension
+import com.vladsch.flexmark.html.HtmlRenderer
+import com.vladsch.flexmark.parser.Parser
+import com.vladsch.flexmark.util.ast.Node
+import com.vladsch.flexmark.util.data.MutableDataSet
+import com.vladsch.flexmark.util.misc.Extension
 import javafx.application.Application
 import javafx.event.EventHandler
 import javafx.scene.Scene
@@ -8,15 +16,14 @@ import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
-import javafx.scene.text.Text
+import javafx.scene.web.WebView
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintWriter
 import java.util.*
-import javafx.scene.web.WebView;
-import javafx.scene.web.*
+
 
 class Main : Application() {
     override fun start(stage: Stage) {
@@ -26,6 +33,13 @@ class Main : Application() {
         val strikethrough = Button("S")
         val compileMd = Button("Compile")
 
+        val options = MutableDataSet().set(
+            Parser.EXTENSIONS, Arrays.asList(TablesExtension.create(),
+                StrikethroughExtension.create(),
+                GitLabExtension.create()) as Collection<Extension>
+        ).toImmutable()
+        val parser: Parser = Parser.builder(options).build()
+        val renderer = HtmlRenderer.builder(options).build()
 
         val toolbar = ToolBar(
 
@@ -101,7 +115,7 @@ class Main : Application() {
                 currentHighlight = "Heading"
             }
             //text.insert("**" + currentHighlight + "**", text.getCaretPosition());
-            text.replaceSelection("##" + currentHighlight);
+            text.replaceSelection("## " + currentHighlight);
         }
         strikethrough.setOnMouseClicked {
             var currentHighlight = text.selectedText
@@ -112,7 +126,10 @@ class Main : Application() {
             text.replaceSelection("~~" + currentHighlight + "~~");
         }
         compileMd.setOnMouseClicked {
-            webView.getEngine().loadContent(text.text);
+            val document: Node = parser.parse(text.text)
+            val html = renderer.render(document)
+            System.out.println(html);
+            webView.getEngine().loadContent(html);
         }
 
         bold.setTooltip( Tooltip("Bold - Meta+Shift+B"))

@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":shared"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     testImplementation(kotlin("test"))
+    implementation("com.vladsch.flexmark:flexmark-all:0.64.0")
 }
 
 tasks.test {
