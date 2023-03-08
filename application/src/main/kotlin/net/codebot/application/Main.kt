@@ -41,6 +41,7 @@ class Main : Application() {
         val parser: Parser = Parser.builder(options).build()
         val renderer = HtmlRenderer.builder(options).build()
 
+
         val toolbar = ToolBar(
 
             bold,
@@ -70,10 +71,7 @@ class Main : Application() {
         val label = Label("")
         val status = HBox(label)
 
-        text.textProperty().addListener { observable, oldValue, newValue ->
-            val newlines = newValue.split("\n").size
-            val spaces = newValue.split("\\s+".toRegex()).size
-            label.text = "Character count: " + newValue.length + "   Line Count: " + newlines + "   Word Count: " + spaces  }
+
 
         // code for left pane
         val tree = FolderView().build()
@@ -91,6 +89,52 @@ class Main : Application() {
         val right = webView
         // val right = HBox(display_text)
         //right.prefWidth = 650.0
+
+        fun compiledat(){
+            val document: Node = parser.parse(text.text)
+            var html = renderer.render(document)
+            System.out.println(html);
+            html = """
+                <!DOCTYPE html>
+            <!-- KaTeX requires the use of the HTML5 doctype. Without it, KaTeX may not render properly -->
+            <html>
+            
+            <head>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+
+            <!-- The loading of KaTeX is deferred to speed up page rendering -->
+            <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
+
+            <!-- To automatically render math in text elements, include the auto-render extension: -->
+            <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+            onload="renderMathInElement(document.body);"></script>
+            </head>""" + html + """<script>
+                (function () {
+                  document.addEventListener("DOMContentLoaded", function () {
+                    var mathElems = document.getElementsByClassName("katex");
+                    var elems = [];
+                    for (const i in mathElems) {
+                        if (mathElems.hasOwnProperty(i)) elems.push(mathElems[i]);
+                    }
+            
+                    elems.forEach(elem => {
+                        katex.render(elem.textContent, elem, { throwOnError: false, displayMode: elem.nodeName !== 'SPAN', });
+                    });
+                });
+            })(); </html>"""
+            webView.getEngine().loadContent(html);
+        }
+
+        text.textProperty().addListener { observable, oldValue, newValue ->
+            val newlines = newValue.split("\n").size
+            val spaces = newValue.split("\\s+".toRegex()).size
+            label.text = "Character count: " + newValue.length + "   Line Count: " + newlines + "   Word Count: " + spaces
+            compiledat()
+        }
+
+        compileMd.setOnMouseClicked {
+            compiledat()
+        }
 
         bold.setOnMouseClicked {
             var currentHighlight = text.selectedText
@@ -125,12 +169,7 @@ class Main : Application() {
             //text.insert("**" + currentHighlight + "**", text.getCaretPosition());
             text.replaceSelection("~~" + currentHighlight + "~~");
         }
-        compileMd.setOnMouseClicked {
-            val document: Node = parser.parse(text.text)
-            val html = renderer.render(document)
-            System.out.println(html);
-            webView.getEngine().loadContent(html);
-        }
+
 
         bold.setTooltip( Tooltip("Bold - Meta+Shift+B"))
         italics.setTooltip( Tooltip("Italic - Meta+Shift+I"))
