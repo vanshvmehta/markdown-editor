@@ -5,7 +5,6 @@ plugins {
     kotlin("jvm") version "1.6.20"
     id("org.openjfx.javafxplugin") version "0.0.13"
     id("org.beryx.jlink") version "2.25.0"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.6.20"
 }
 
 group = "net.codebot"
@@ -23,7 +22,6 @@ dependencies {
     implementation(project(":shared"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     testImplementation(kotlin("test"))
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 }
 
 tasks.test {
