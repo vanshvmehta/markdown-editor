@@ -1,0 +1,48 @@
+.text-area{
+    -fx-control-inner-background: #707070;
+    -fx-text-fill: #FFFFFF;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.text-area .scroll-bar{
+    -fx-background-color: #707070;
+}
+
+.folder-view{
+    -fx-control-inner-background: #707070;
+    -fx-text-fill: #FFFFFF;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.folder-view .scroll-bar{
+    -fx-background-color: #707070;
+}
+
+.status-text{
+    -fx-text-fill: #FFFFFF;
+}
+
+.status-bar{
+    -fx-background-color: #3B3B3B;
+}
+
+.menu .label{
+    -fx-control-inner-background: #707070;
+    -fx-text-fill: #FFFFFF;
+}
+
+.menu-bar{
+    -fx-background-color: #3B3B3B;
+    -fx-control-inner-background: #707070;
+}
+
+.tool-bar{
+    -fx-background-color: #3B3B3B;
+}
+
+.tool-bar .button{
+    -fx-background-color: #707070;
+    -fx-text-fill: #FFFFFF;
+}

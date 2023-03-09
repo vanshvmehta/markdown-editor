@@ -1,0 +1,33 @@
+.text-area{
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.text-area .scroll-bar{
+}
+
+.folder-view{
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.folder-view .scroll-bar{
+}
+
+.status-text{
+}
+
+.status-bar{
+}
+
+.menu .label{
+}
+
+.menu-bar{
+}
+
+.tool-bar{
+}
+
+.tool-bar .button{
+}
