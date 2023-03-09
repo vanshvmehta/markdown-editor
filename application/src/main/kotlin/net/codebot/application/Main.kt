@@ -8,7 +8,6 @@ import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
-import javafx.scene.text.Text
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import java.io.File
@@ -16,14 +15,19 @@ import java.io.FileNotFoundException
 import java.io.PrintWriter
 import java.util.*
 
+
+
 class Main : Application() {
     override fun start(stage: Stage) {
+
+        //Config, setting up themeColor and default file location
+        var userConfig = initConfig()
+
         val bold = Button("B")
         val italics = Button("I")
         val heading = Button("H")
         val strikethrough = Button("S")
         val compileMd = Button("Compile")
-
 
         val toolbar = ToolBar(
 
@@ -117,16 +121,17 @@ class Main : Application() {
 
         val file = Menu("File")
         val openFile = MenuItem("Open File")
-        val new = MenuItem("New")
+        val newFile = MenuItem("New")
         val saveFile = MenuItem("Save")
         val exitApp = MenuItem("Exit")
-        file.items.addAll(openFile, new, saveFile, exitApp)
+        file.items.addAll(openFile, newFile, saveFile, exitApp)
 
         val edit = Menu("Edit")
         val cut = MenuItem("Cut")
         val copy = MenuItem("Copy")
         val paste = MenuItem("Paste")
         edit.items.addAll(cut, copy, paste)
+
 
         //Create SubMenu Help.
         //Create SubMenu Help.
@@ -139,11 +144,22 @@ class Main : Application() {
         topContainer.getChildren().add(mainMenu);
         topContainer.getChildren().add(toolbar);
 
+        //NewFile
+        newFile.onAction = EventHandler {
+            text.clear();
+        }
+
         //OpenFile function
         openFile.onAction = EventHandler {
             val filechooser = FileChooser();
             filechooser.setTitle("Open my file");
-            filechooser.setInitialDirectory(File(System.getProperty("user.home")));
+
+            if (userConfig.defaultFileLocation == "user.home") {
+                filechooser.setInitialDirectory(File(System.getProperty(userConfig.defaultFileLocation)))
+            } else {
+                filechooser.setInitialDirectory(File(userConfig.defaultFileLocation))
+            }
+
             val selectedFile = filechooser.showOpenDialog(stage);
             try {
                 val scanner = Scanner(selectedFile);
@@ -155,11 +171,20 @@ class Main : Application() {
                 e.printStackTrace();
             }
             border.left = FolderView().build(selectedFile.parentFile.absolutePath)
+            userConfig = updateFileLocationConfig(userConfig, selectedFile.parentFile.absolutePath)
         }
 
         //SaveFile function
         saveFile.onAction = EventHandler {
-            val file = FileChooser().showSaveDialog(Stage());
+            val savefilechooser = FileChooser();
+
+            if (userConfig.defaultFileLocation == "user.home") {
+                savefilechooser.setInitialDirectory(File(System.getProperty(userConfig.defaultFileLocation)))
+            } else {
+                savefilechooser.setInitialDirectory(File(userConfig.defaultFileLocation))
+            }
+
+            val file = savefilechooser.showSaveDialog(Stage());
             if (file != null) {
                 try {
                     val printWriter = PrintWriter(file);
