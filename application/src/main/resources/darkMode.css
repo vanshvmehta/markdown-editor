@@ -14,6 +14,7 @@
     -fx-text-fill: #FFFFFF;
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
+    -fx-selection-bar: #969A9F;
 }
 
 .folder-view .scroll-bar{
@@ -36,6 +37,10 @@
 .menu-bar{
     -fx-background-color: #3B3B3B;
     -fx-control-inner-background: #707070;
+    -fx-selection-bar: #969A9F;
+}
+.menu-item:focused{
+     -fx-background-color: #969A9F;
 }
 
 .tool-bar{
