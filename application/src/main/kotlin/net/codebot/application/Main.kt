@@ -18,6 +18,9 @@ import java.util.*
 
 class Main : Application() {
     override fun start(stage: Stage) {
+        // variables to know on startup? maybe user preferences etc.
+        var cur_theme = "darkMode.css"
+
         val bold = Button("B")
         val italics = Button("I")
         val heading = Button("H")
@@ -136,13 +139,41 @@ class Main : Application() {
         //Create SubMenu Help.
         //Create SubMenu Help.
         val view = Menu("View")
-        val themes = MenuItem("Themes")
+        val themes = Menu("Themes")
+        val themesLight = MenuItem("Light Mode")
+        val themesDark = MenuItem("Dark Mode")
+        themes.items.addAll(themesLight, themesDark)
         view.items.add(themes)
 
-        mainMenu.getMenus().addAll(file, edit);
+        mainMenu.getMenus().addAll(file, edit, view);
 
         topContainer.getChildren().add(mainMenu);
         topContainer.getChildren().add(toolbar);
+
+        // stylesheets for themes
+        fun setThemes() {
+            // clear and attach new theme
+            border.getStylesheets().clear()
+            border.getStylesheets().add(cur_theme)
+
+            // menu bars
+            mainMenu.getStyleClass().add("menu-bar")
+            mainMenu.getStyleClass().add("menu")
+            toolbar.getStyleClass().add("toolbar")
+
+            // center text area
+            text.getStyleClass().add("text-area")
+
+            // status bar
+            label.getStyleClass().add("status-text")
+            status.getStyleClass().add("status-bar")
+
+            // left stylesheets in FolderView.kt
+            left.getStyleClass().add("folder-view")
+
+            // compiled area
+            display_text.getStyleClass().add("text-area")
+        }
 
         //OpenFile function
         openFile.onAction = EventHandler {
@@ -162,6 +193,7 @@ class Main : Application() {
                 e.printStackTrace();
             }
             border.left = FolderView().build(selectedFile.parentFile.absolutePath,true)
+            border.left.getStyleClass().add("folder-view")
         }
 
         //SaveFile function
@@ -178,11 +210,24 @@ class Main : Application() {
             }
         }
 
+        // Themes function
+        themesLight.onAction = EventHandler {
+            cur_theme = "lightMode.css"
+            setThemes()
+        }
+
+        themesDark.onAction = EventHandler {
+            cur_theme = "darkMode.css"
+            setThemes()
+        }
+
         border.top = topContainer
         border.center = center
         border.bottom = status
         border.left = left
         border.right = right
+
+        setThemes()
 
         val scene = Scene(border)
         stage.isResizable = true

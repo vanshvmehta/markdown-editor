@@ -1,0 +1,39 @@
+.text-area{
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.text-area .scroll-bar{
+}
+
+.folder-view{
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-selection-bar: #969A9F;
+}
+
+.folder-view .scroll-bar{
+}
+
+.status-text{
+}
+
+.status-bar{
+}
+
+.menu .label{
+}
+
+.menu-bar{
+    -fx-selection-bar: #969A9F;
+}
+
+.menu-item:focused{
+     -fx-background-color: #969A9F;
+}
+
+.tool-bar{
+}
+
+.tool-bar .button{
+}
