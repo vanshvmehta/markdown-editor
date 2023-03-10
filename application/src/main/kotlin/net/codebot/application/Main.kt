@@ -8,7 +8,6 @@ import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
-import javafx.scene.text.Text
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import java.io.File
@@ -18,6 +17,9 @@ import java.util.*
 
 class Main : Application() {
     override fun start(stage: Stage) {
+
+        //Config, setting up themeColor and default file location
+        var userConfig = initConfig()
         // variables to know on startup? maybe user preferences etc.
         var cur_theme = "darkMode.css"
 
@@ -178,9 +180,13 @@ class Main : Application() {
         //OpenFile function
         openFile.onAction = EventHandler {
             val filechooser = FileChooser();
-            val file = File("C:\\Users");
-            filechooser.setTitle("Open my file");
-            filechooser.setInitialDirectory(file);
+            filechooser.setTitle("Open my file")
+
+            if (userConfig.defaultFileLocation == "user.home") {
+                filechooser.setInitialDirectory(File(System.getProperty(userConfig.defaultFileLocation)))
+            } else {
+                filechooser.setInitialDirectory(File(userConfig.defaultFileLocation))
+            }
 
             val selectedFile = filechooser.showOpenDialog(stage);
             try {
@@ -194,11 +200,19 @@ class Main : Application() {
             }
             border.left = FolderView().build(selectedFile.parentFile.absolutePath,true)
             border.left.getStyleClass().add("folder-view")
+            userConfig = updateFileLocationConfig(userConfig, selectedFile.parentFile.absolutePath)
         }
 
         //SaveFile function
         saveFile.onAction = EventHandler {
-            val file = FileChooser().showSaveDialog(Stage());
+            val savefilechooser = FileChooser()
+
+            if (userConfig.defaultFileLocation == "user.home") {
+                savefilechooser.setInitialDirectory(File(System.getProperty(userConfig.defaultFileLocation)))
+            } else {
+                savefilechooser.setInitialDirectory(File(userConfig.defaultFileLocation))
+            }
+            val file = savefilechooser.showSaveDialog(Stage());
             if (file != null) {
                 try {
                     val printWriter = PrintWriter(file);

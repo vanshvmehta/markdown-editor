@@ -1,1 +1,1 @@
-/Users/vansh/Desktop/CS346/cs346/shared/build/classes/kotlin/main/module-info.class:/Users/vansh/Desktop/CS346/cs346/shared/build/classes/kotlin/main/net/codebot/shared/SysInfo$Companion.class:/Users/vansh/Desktop/CS346/cs346/shared/build/classes/kotlin/main/net/codebot/shared/SysInfo.class
+C:\Users\Terence Chan\cs346\shared\build\classes\kotlin\main\module-info.class;C:\Users\Terence Chan\cs346\shared\build\classes\kotlin\main\net\codebot\shared\SysInfo$Companion.class;C:\Users\Terence Chan\cs346\shared\build\classes\kotlin\main\net\codebot\shared\SysInfo.class
