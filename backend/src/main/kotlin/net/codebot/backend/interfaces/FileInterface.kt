@@ -5,10 +5,11 @@
 //import org.springframework.data.jpa.repository.Query
 //import org.springframework.data.repository.CrudRepository
 //import org.springframework.data.annotation.Id
+//import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 //
-//interface FileInterface: CrudRepository<FileDTO, String> {
+//interface FileInterface: CrudRepository<String, String> {
 //    @Query("select * from FILES")
-//    fun findFiles(): List<FileDTO>
+//    fun findFiles(): String
 //}
 //
 //@Table(name="FILES")

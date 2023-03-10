@@ -12,5 +12,7 @@ module application {
     requires flexmark.util.misc;
     requires flexmark.ext.gitlab;
     requires flexmark.ext.emoji;
+    requires kotlinx.serialization.core;
+    requires kotlinx.serialization.json;
     exports net.codebot.application;
 }

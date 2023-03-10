@@ -25,9 +25,14 @@ import java.io.FileNotFoundException
 import java.io.PrintWriter
 import java.util.*
 
-
 class Main : Application() {
     override fun start(stage: Stage) {
+
+        //Config, setting up themeColor and default file location
+        var userConfig = initConfig()
+        // variables to know on startup? maybe user preferences etc.
+        var cur_theme = "darkMode.css"
+
         val bold = Button("B")
         val italics = Button("I")
         val heading = Button("H")
@@ -55,36 +60,37 @@ class Main : Application() {
 
         val text = TextArea()
         text.isWrapText = true
-        text.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, " +
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, " +
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, " +
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, " +
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, " +
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, " +
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        text.text = "## Releases\n" +
+                "// 2/16/2023\n" +
+                "// Version : 1.0.0\n" +
+                "Baseline functionality\n" +
+                "- A resizable application\n" +
+                "- Toolbars\n" +
+                "- Buttons for basic Markdown syntax bold, italics etc.\n" +
+                "- Text pane to type\n" +
+                "- Display pane and compile button\n" +
+                "- Ability to open .txt files\n" +
+                "- Ability to save .txt files\n" +
+                "- File directory pane"
         text.font = Font("Helvetica", 12.0)
         text.prefColumnCount = 200
         val center = HBox(text)
         center.minWidth = 400.0
 
-
-
         // code for status bar (bottom pane)
         val label = Label("")
         val status = HBox(label)
 
-
-
         // code for left pane
         val tree = FolderView().build()
         val left = tree
-        left.prefWidth = 250.0
+        left.prefWidth = 200.0
 
         // code for right pane
         val webView = WebView()
         val display_text = TextArea()
         display_text.isWrapText = true
-        display_text.text = "Uneditable Text"
+        display_text.text = "Compiled text goes here!"
         display_text.font = Font("Helvetica", 12.0)
         display_text.prefColumnCount = 200
         display_text.isEditable = false
@@ -200,19 +206,53 @@ class Main : Application() {
         //Create SubMenu Help.
         //Create SubMenu Help.
         val view = Menu("View")
-        val themes = MenuItem("Themes")
+        val themes = Menu("Themes")
+        val themesLight = MenuItem("Light Mode")
+        val themesDark = MenuItem("Dark Mode")
+        themes.items.addAll(themesLight, themesDark)
         view.items.add(themes)
 
-        mainMenu.getMenus().addAll(file, edit);
+        mainMenu.getMenus().addAll(file, edit, view);
 
         topContainer.getChildren().add(mainMenu);
         topContainer.getChildren().add(toolbar);
 
+        // stylesheets for themes
+        fun setThemes() {
+            // clear and attach new theme
+            border.getStylesheets().clear()
+            border.getStylesheets().add(cur_theme)
+
+            // menu bars
+            mainMenu.getStyleClass().add("menu-bar")
+            mainMenu.getStyleClass().add("menu")
+            toolbar.getStyleClass().add("toolbar")
+
+            // center text area
+            text.getStyleClass().add("text-area")
+
+            // status bar
+            label.getStyleClass().add("status-text")
+            status.getStyleClass().add("status-bar")
+
+            // left stylesheets in FolderView.kt
+            left.getStyleClass().add("folder-view")
+
+            // compiled area
+            display_text.getStyleClass().add("text-area")
+        }
+
         //OpenFile function
         openFile.onAction = EventHandler {
             val filechooser = FileChooser();
-            filechooser.setTitle("Open my file");
-            filechooser.setInitialDirectory(File(System.getProperty("user.home")));
+            filechooser.setTitle("Open my file")
+
+            if (userConfig.defaultFileLocation == "user.home") {
+                filechooser.setInitialDirectory(File(System.getProperty(userConfig.defaultFileLocation)))
+            } else {
+                filechooser.setInitialDirectory(File(userConfig.defaultFileLocation))
+            }
+
             val selectedFile = filechooser.showOpenDialog(stage);
             try {
                 val scanner = Scanner(selectedFile);
@@ -223,12 +263,21 @@ class Main : Application() {
             } catch (e: FileNotFoundException) {
                 e.printStackTrace();
             }
-            border.left = FolderView().build(selectedFile.parentFile.absolutePath)
+            border.left = FolderView().build(selectedFile.parentFile.absolutePath,true)
+            border.left.getStyleClass().add("folder-view")
+            userConfig = updateFileLocationConfig(userConfig, selectedFile.parentFile.absolutePath)
         }
 
         //SaveFile function
         saveFile.onAction = EventHandler {
-            val file = FileChooser().showSaveDialog(Stage());
+            val savefilechooser = FileChooser()
+
+            if (userConfig.defaultFileLocation == "user.home") {
+                savefilechooser.setInitialDirectory(File(System.getProperty(userConfig.defaultFileLocation)))
+            } else {
+                savefilechooser.setInitialDirectory(File(userConfig.defaultFileLocation))
+            }
+            val file = savefilechooser.showSaveDialog(Stage());
             if (file != null) {
                 try {
                     val printWriter = PrintWriter(file);
@@ -240,11 +289,24 @@ class Main : Application() {
             }
         }
 
+        // Themes function
+        themesLight.onAction = EventHandler {
+            cur_theme = "lightMode.css"
+            setThemes()
+        }
+
+        themesDark.onAction = EventHandler {
+            cur_theme = "darkMode.css"
+            setThemes()
+        }
+
         border.top = topContainer
         border.center = center
         border.bottom = status
         border.left = left
         border.right = right
+
+        setThemes()
 
         val scene = Scene(border)
         stage.isResizable = true

@@ -6,18 +6,52 @@ import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.StackPane
 import java.io.File
+import java.lang.Integer.min
+import kotlin.math.max
 
 class FolderView {
-    fun build(pathname: String = "src/main/kotlin") : StackPane {
-        val folder_img = ImageView(Image("https://png.pngtree.com/png-vector/20190916/ourmid/pngtree-folder-icon-for-your-project-png-image_1731079.jpg"))
-        folder_img.fitWidth = 20.0
-        folder_img.fitHeight = 20.0
-        val folderIcon: Node = folder_img
-        val rootItem = TreeItem<Any?>("Inbox", folderIcon)
+    fun build(pathname: String = "No Working Directory", dir_selected: Boolean = false) : StackPane {
+        // images for file directory
+        val folder_icon = ImageView(Image("https://www.iconpacks.net/icons/2/free-folder-icon-1485-thumb.png"))
+        val image_icon = ImageView(Image("https://cdn-icons-png.flaticon.com/512/1160/1160358.png"))
+        val text_icon = ImageView(Image("https://cdn-icons-png.flaticon.com/512/32/32329.png"))
+        val pdf_icon = ImageView(Image("https://icons.veryicon.com/png/o/file-type/file-type-1/pdf-icon.png"))
+        val blank_icon = ImageView(Image("https://cdn-icons-png.flaticon.com/512/101/101671.png"))
+
+        // formatting images
+        folder_icon.fitWidth = 20.0
+        folder_icon.fitHeight = 20.0
+
+        // building tree
+        val folderIcon: Node = folder_icon
+        val rootItem = TreeItem<Any?>(pathname, folderIcon)
         rootItem.isExpanded = true
-        File(pathname).walk(FileWalkDirection.BOTTOM_UP).forEach {
-            val item = TreeItem<Any?>(it)
-            rootItem.children.add(item)
+        if (dir_selected) {
+            val len = pathname.length
+            File(pathname)
+                .walk(FileWalkDirection.BOTTOM_UP)
+                .maxDepth(1)
+                .sortedBy { it.isDirectory }
+                .forEach {
+                    var item_icon = ImageView(folder_icon.image)
+
+                    if (it.absoluteFile.isDirectory) {
+                        item_icon = ImageView(folder_icon.image)
+                    } else {
+                        when (it.absoluteFile.extension) {
+                            "png", "svg", "jpeg" -> item_icon = ImageView(image_icon.image)
+                            "txt", "md" -> item_icon = ImageView(text_icon.image)
+                            "pdf" -> item_icon = ImageView(pdf_icon.image)
+                            else -> item_icon = ImageView(blank_icon.image)
+                        }
+                    }
+                    item_icon.fitWidth = 20.0
+                    item_icon.fitHeight = 20.0
+                    val item = TreeItem<Any?>(it.absolutePath.substring(min(it.absolutePath.length, len + 1)),
+                        item_icon)
+                    rootItem.children.add(item)
+            }
+            rootItem.children.removeLast()
         }
         return StackPane(TreeView<Any?>(rootItem))
     }
