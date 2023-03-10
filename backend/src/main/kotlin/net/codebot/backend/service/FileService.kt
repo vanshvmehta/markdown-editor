@@ -9,7 +9,7 @@ import java.util.Objects
 import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 @Service
-class FileService(private final val databaseSvc: DatabaseService) {
+class FileService(databaseSvc: DatabaseService) {
     private final var conn: Connection? = databaseSvc.connection()
 
     init {
@@ -25,7 +25,7 @@ class FileService(private final val databaseSvc: DatabaseService) {
         }
     }
 
-    fun getFiles(): List<FileDTO>? {
+    fun getFiles(user: String): List<FileDTO>? {
         var retVal = mutableListOf<FileDTO>()
         try {
             if (conn != null) {
@@ -38,7 +38,7 @@ class FileService(private final val databaseSvc: DatabaseService) {
                     val name = results.getString("name")
                     val path = results.getString("path")
 
-                    val file: FileDTO = FileDTO(id, name, path)
+                    val file = FileDTO(id, name, path)
                     retVal.add(file)
                 }
             }
@@ -49,7 +49,7 @@ class FileService(private final val databaseSvc: DatabaseService) {
         return retVal
     }
 
-    fun postFiles(file: FileDTO): MutableMap<String, String> {
+    fun createFile(file: FileDTO, user: String): MutableMap<String, String> {
         val response = mutableMapOf<String, String>()
         response["success"] = "false"
         try {
@@ -71,6 +71,62 @@ class FileService(private final val databaseSvc: DatabaseService) {
                 }
             }
         } catch (ex: SQLException) {
+            response["message"] = ex.message.toString()
+            println(ex.message)
+        }
+
+        return response
+    }
+
+    fun postFile(file: FileDTO, user: String): MutableMap<String, String> {
+        val response = mutableMapOf<String, String>()
+        response["success"] = "false"
+        try {
+            if (conn != null) {
+//                val sql = "insert into files values ('" + file.id + "', '" + file.name + "', '" + file.path + "')"
+                val sql = "UPDATE files SET name = ? AND path = ? WHERE id = ?"
+                val preparedStatement: PreparedStatement = conn!!.prepareStatement(sql)
+                preparedStatement.setString(3, file.id)
+                preparedStatement.setString(1, file.name)
+                preparedStatement.setString(2, file.path)
+
+                val result: Int = preparedStatement.executeUpdate()
+
+                if (result != 0) {
+                    println("Successfully updated file in the db")
+                    response["success"] = "true"
+                } else {
+                    println("Failed to update file in the db")
+                }
+            }
+        } catch (ex: SQLException) {
+            response["message"] = ex.message.toString()
+            println(ex.message)
+        }
+
+        return response
+    }
+
+    fun deleteFile(id: String, user: String): MutableMap<String, String> {
+        val response = mutableMapOf<String, String>()
+        response["success"] = "false"
+        try {
+            if (conn != null) {
+                val sql = "DELETE FROM files WHERE id = ?"
+                val preparedStatement: PreparedStatement = conn!!.prepareStatement(sql)
+                preparedStatement.setString(1, id)
+
+                val result: Int = preparedStatement.executeUpdate()
+
+                if (result != 0) {
+                    println("Successfully delete file from the db")
+                    response["success"] = "true"
+                } else {
+                    println("Failed to delete file from the db")
+                }
+            }
+        } catch (ex: SQLException) {
+            response["message"] = ex.message.toString()
             println(ex.message)
         }
 
