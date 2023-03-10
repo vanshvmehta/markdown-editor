@@ -1,5 +1,6 @@
 package net.codebot.application
 
+import com.vladsch.flexmark.ext.emoji.EmojiExtension
 import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension
 import com.vladsch.flexmark.ext.gitlab.GitLabExtension
 import com.vladsch.flexmark.ext.tables.TablesExtension
@@ -36,7 +37,8 @@ class Main : Application() {
         val options = MutableDataSet().set(
             Parser.EXTENSIONS, Arrays.asList(TablesExtension.create(),
                 StrikethroughExtension.create(),
-                GitLabExtension.create()) as Collection<Extension>
+                GitLabExtension.create(),
+                EmojiExtension.create()) as Collection<Extension>
         ).toImmutable()
         val parser: Parser = Parser.builder(options).build()
         val renderer = HtmlRenderer.builder(options).build()

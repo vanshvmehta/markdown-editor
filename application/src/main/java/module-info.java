@@ -11,5 +11,6 @@ module application {
     requires flexmark.ext.gfm.strikethrough;
     requires flexmark.util.misc;
     requires flexmark.ext.gitlab;
+    requires flexmark.ext.emoji;
     exports net.codebot.application;
 }
