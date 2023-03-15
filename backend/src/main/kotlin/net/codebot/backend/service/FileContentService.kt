@@ -9,14 +9,7 @@ import java.nio.file.Paths
 @Service
 class FileContentService {
     private final val basePath: String = "./fileContents"
-    init {
-        try {
-            Files.createDirectory(Paths.get(basePath))
-            println("Successfully created fileContents directory")
-        } catch (e: IOException) {
-            println("fileContents directory already exists")
-        }
-    }
+
     fun getFileContent(user: String, id: String): MutableMap<String, String> {
         val response = mutableMapOf<String, String>()
         response["success"] = "false"
