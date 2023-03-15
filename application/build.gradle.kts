@@ -23,7 +23,9 @@ dependencies {
     implementation(project(":shared"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     testImplementation(kotlin("test"))
+    implementation("com.vladsch.flexmark:flexmark-all:0.64.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+
 }
 
 tasks.test {
@@ -37,13 +39,12 @@ tasks.withType<KotlinCompile> {
 application {
     mainModule.set("application")
     mainClass.set("net.codebot.application.Main")
-
 }
 
 javafx {
     // version is determined by the plugin above
     version = "18.0.2"
-    modules = listOf("javafx.controls", "javafx.graphics")
+    modules = listOf("javafx.controls", "javafx.graphics", "javafx.web")
 }
 
 // https://stackoverflow.com/questions/74453018/jlink-package-kotlin-in-both-merged-module-and-kotlin-stdlib
