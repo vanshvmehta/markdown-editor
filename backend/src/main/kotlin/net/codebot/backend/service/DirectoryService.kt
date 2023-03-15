@@ -24,7 +24,7 @@ class DirectoryService {
 
         try {
             val completePath = "$basePath/$user/$path"
-            val directory = File(path)
+            val directory = File(completePath)
 
             val contents: MutableList<ContentDTO> = mutableListOf()
             if (directory.isDirectory) {
@@ -48,6 +48,11 @@ class DirectoryService {
         response["success"] = "false"
 
         try {
+            val directoryPath = "$basePath/$user"
+            if (!File(directoryPath).isDirectory) {
+                Files.createDirectory(Paths.get(directoryPath))
+            }
+
             Files.createDirectory(Paths.get("$basePath/$user/$path/$name"))
             response["success"] = "true"
         } catch (e: Exception) {
@@ -84,13 +89,29 @@ class DirectoryService {
 
         try {
             val completePath = "$basePath/$user/$path"
-            File(completePath).deleteRecursively()
+            val directory = File(completePath)
+
+            if (directory.isDirectory) deleteDirectory(directory)
+            else throw Exception("path not a directory")
 
             response["success"] = "true"
         } catch (e: Exception) {
-            println(e.message)
+            response["message"] = e.message.toString()
         }
 
         return response
+    }
+
+    fun deleteDirectory(directory: File) {
+        try {
+            for (file in directory.listFiles()!!) {
+                if (file.isDirectory) deleteDirectory(file)
+                else Files.delete(Paths.get(file.path))
+            }
+
+            Files.delete(Paths.get(directory.path))
+        } catch (e: Exception) {
+            println(e.message)
+        }
     }
 }
