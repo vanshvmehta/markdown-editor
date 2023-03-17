@@ -1,11 +1,15 @@
 package net.codebot.application
+import com.vladsch.flexmark.profile.pegdown.Extensions
 
 import com.vladsch.flexmark.ext.emoji.EmojiExtension
 import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension
 import com.vladsch.flexmark.ext.gitlab.GitLabExtension
 import com.vladsch.flexmark.ext.tables.TablesExtension
+import com.vladsch.flexmark.ext.toc.TocExtension
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
+import com.vladsch.flexmark.pdf.converter.PdfConverterExtension
+import com.vladsch.flexmark.profile.pegdown.PegdownOptionsAdapter
 import com.vladsch.flexmark.util.ast.Node
 import com.vladsch.flexmark.util.data.MutableDataSet
 import com.vladsch.flexmark.util.misc.Extension
@@ -42,7 +46,7 @@ class Main : Application() {
         val compileMd = Button("Compile")
 
         val options = MutableDataSet().set(
-            Parser.EXTENSIONS, Arrays.asList(TablesExtension.create(),
+            Parser.EXTENSIONS, listOf(TablesExtension.create(),
                 StrikethroughExtension.create(),
                 GitLabExtension.create(),
                 EmojiExtension.create()) as Collection<Extension>
@@ -57,6 +61,8 @@ class Main : Application() {
             FXCollections.observableList(sizes)
         )
         val combofont = ComboBox<String>()
+
+        var htmlstr = ""
 
         combofont.setValue(Font.getDefault().family)
         combofont.items.setAll(Font.getFamilies())
@@ -173,6 +179,7 @@ class Main : Application() {
                     });
                 });
             })(); </html>"""
+            htmlstr= html
             webView.engine.loadContent(html);
         }
         compilesize.valueProperty().addListener { _, _, newVal ->
@@ -243,8 +250,11 @@ class Main : Application() {
         val openFile = MenuItem("Open File")
         val new = MenuItem("New")
         val saveFile = MenuItem("Save")
+        val saveas = Menu("Save As")
+        val savepdf = MenuItem(".pdf")
+        saveas.items.addAll(savepdf)
         val exitApp = MenuItem("Exit")
-        file.items.addAll(openFile, new, saveFile, exitApp)
+        file.items.addAll(openFile, new, saveFile, saveas, exitApp)
 
         val edit = Menu("Edit")
         val cut = MenuItem("Cut")
@@ -326,6 +336,7 @@ class Main : Application() {
             } else {
                 savefilechooser.setInitialDirectory(File(userConfig.defaultFileLocation))
             }
+            println(savefilechooser.initialDirectory)
             val file = savefilechooser.showSaveDialog(Stage());
             if (file != null) {
                 try {
@@ -336,6 +347,25 @@ class Main : Application() {
                     e.printStackTrace();
                 }
             }
+        }
+
+        val OPTIONS = PegdownOptionsAdapter.flexmarkOptions(
+            Extensions.ALL and (Extensions.ANCHORLINKS or Extensions.EXTANCHORLINKS_WRAP).inv(), TocExtension.create()
+        ).toMutable()
+            .set(TocExtension.LIST_CLASS, PdfConverterExtension.DEFAULT_TOC_LIST_CLASS)
+            .toImmutable()
+
+        savepdf.onAction = EventHandler {
+            var savefilechooser = FileChooser()
+            if (userConfig.defaultFileLocation == "user.home") {
+                savefilechooser.setInitialDirectory(File(System.getProperty(userConfig.defaultFileLocation)))
+            } else {
+                savefilechooser.setInitialDirectory(File(userConfig.defaultFileLocation))
+            }
+            val strfile = savefilechooser.initialDirectory.toString()
+            //val html = webView.engine.executeScript("document.documentElement.outerHTML")//.toString()
+            PdfConverterExtension.exportToPdf(strfile + "/test.pdf", htmlstr, "", OPTIONS)
+
         }
 
         // Themes function
