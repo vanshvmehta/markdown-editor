@@ -10,6 +10,7 @@ import com.vladsch.flexmark.util.ast.Node
 import com.vladsch.flexmark.util.data.MutableDataSet
 import com.vladsch.flexmark.util.misc.Extension
 import javafx.application.Application
+import javafx.collections.FXCollections
 import javafx.event.EventHandler
 import javafx.scene.Scene
 import javafx.scene.control.*
@@ -24,6 +25,7 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintWriter
 import java.util.*
+
 
 class Main : Application() {
     override fun start(stage: Stage) {
@@ -48,6 +50,19 @@ class Main : Application() {
         val parser: Parser = Parser.builder(options).build()
         val renderer = HtmlRenderer.builder(options).build()
 
+        val sizes = listOf("6","7","8","9","10","11","12","13","14","15","16","17","18")
+
+            //val combo_box = ComboBox(sizes)
+        val combo = ComboBox(
+            FXCollections.observableList(sizes)
+        )
+        val combofont = ComboBox<String>()
+
+        combofont.setValue(Font.getDefault().family)
+        combofont.items.setAll(Font.getFamilies())
+        combo.selectionModel.select("12")
+        combo.minWidth = 59.0
+        combo.maxWidth = 59.0
 
         val toolbar = ToolBar(
 
@@ -55,7 +70,9 @@ class Main : Application() {
             italics,
             heading,
             strikethrough,
-            compileMd
+            compileMd,
+            combo,
+            combofont
         )
 
         val text = TextArea()
@@ -72,10 +89,18 @@ class Main : Application() {
                 "- Ability to open .txt files\n" +
                 "- Ability to save .txt files\n" +
                 "- File directory pane"
+
         text.font = Font("Helvetica", 12.0)
         text.prefColumnCount = 200
         val center = HBox(text)
         center.minWidth = 400.0
+
+        combo.valueProperty().addListener { _, _, newVal ->
+            text.font = Font("Helvetica", newVal.toDouble())
+        }
+        combofont.valueProperty().addListener { _, _, newVal ->
+            text.font = Font(newVal, text.font.size)
+        }
 
         // code for status bar (bottom pane)
         val label = Label("")
@@ -101,7 +126,7 @@ class Main : Application() {
         fun compiledat(){
             val document: Node = parser.parse(text.text)
             var html = renderer.render(document)
-            System.out.println(html);
+            //System.out.println(html);
             html = """
                 <!DOCTYPE html>
             <!-- KaTeX requires the use of the HTML5 doctype. Without it, KaTeX may not render properly -->
