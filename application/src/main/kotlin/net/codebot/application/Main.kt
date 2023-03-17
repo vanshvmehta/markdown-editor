@@ -61,8 +61,23 @@ class Main : Application() {
         combofont.setValue(Font.getDefault().family)
         combofont.items.setAll(Font.getFamilies())
         combo.selectionModel.select("12")
-        combo.minWidth = 59.0
-        combo.maxWidth = 59.0
+        combo.minWidth = 60.0
+        combo.maxWidth = 60.0
+        combofont.minWidth = 100.0
+        combofont.maxWidth = 100.0
+
+        val compilesize = ComboBox(
+            FXCollections.observableList(sizes)
+        )
+        val compilefont = ComboBox<String>()
+
+        compilefont.setValue(Font.getDefault().family)
+        compilefont.items.setAll(Font.getFamilies())
+        compilesize.selectionModel.select("12")
+        compilesize.minWidth = 60.0
+        compilesize.maxWidth = 60.0
+        compilefont.minWidth = 100.0
+        compilefont.maxWidth = 100.0
 
         val toolbar = ToolBar(
 
@@ -72,7 +87,9 @@ class Main : Application() {
             strikethrough,
             compileMd,
             combo,
-            combofont
+            combofont,
+            compilesize,
+            compilefont
         )
 
         val text = TextArea()
@@ -101,6 +118,7 @@ class Main : Application() {
         combofont.valueProperty().addListener { _, _, newVal ->
             text.font = Font(newVal, text.font.size)
         }
+
 
         // code for status bar (bottom pane)
         val label = Label("")
@@ -155,7 +173,13 @@ class Main : Application() {
                     });
                 });
             })(); </html>"""
-            webView.getEngine().loadContent(html);
+            webView.engine.loadContent(html);
+        }
+        compilesize.valueProperty().addListener { _, _, newVal ->
+            webView.engine.userStyleSheetLocation = "data:,body { font: " + newVal +"px " + compilefont.value + "; }";
+        }
+        compilefont.valueProperty().addListener { _, _, newVal ->
+            webView.engine.userStyleSheetLocation = "data:,body { font: " + compilesize.value +"px " + newVal + "; }";
         }
 
         text.textProperty().addListener { observable, oldValue, newValue ->
