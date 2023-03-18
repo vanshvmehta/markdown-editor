@@ -16,6 +16,7 @@ import javafx.scene.control.*
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
+import javafx.scene.paint.Color
 import javafx.scene.text.Font
 import javafx.scene.web.WebView
 import javafx.stage.FileChooser
@@ -88,15 +89,7 @@ class Main : Application() {
 
         // code for right pane
         val webView = WebView()
-        val display_text = TextArea()
-        display_text.isWrapText = true
-        display_text.text = "Compiled text goes here!"
-        display_text.font = Font("Helvetica", 12.0)
-        display_text.prefColumnCount = 200
-        display_text.isEditable = false
         val right = webView
-        // val right = HBox(display_text)
-        //right.prefWidth = 650.0
 
         fun compiledat(){
             val document: Node = parser.parse(text.text)
@@ -239,7 +232,7 @@ class Main : Application() {
             left.getStyleClass().add("folder-view")
 
             // compiled area
-            display_text.getStyleClass().add("text-area")
+            webView.engine.setUserStyleSheetLocation("file:src\\main\\resources\\" + cur_theme)
         }
 
         //OpenFile function
