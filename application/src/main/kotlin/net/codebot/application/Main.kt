@@ -44,6 +44,8 @@ class Main : Application() {
         val heading = Button("H")
         val strikethrough = Button("S")
         val compileMd = Button("Compile")
+        val plus = Button("+")
+        val minus = Button("-")
 
         val options = MutableDataSet().set(
             Parser.EXTENSIONS, listOf(TablesExtension.create(),
@@ -54,47 +56,52 @@ class Main : Application() {
         val parser: Parser = Parser.builder(options).build()
         val renderer = HtmlRenderer.builder(options).build()
 
-        val sizes = listOf("6","7","8","9","10","11","12","13","14","15","16","17","18")
+
+        val windows = listOf("Edit Window","Compile Window")
+        val winchoice = ComboBox(
+            FXCollections.observableList(windows)
+        )
+        winchoice.selectionModel.select("Edit Window")
+        winchoice.minWidth = 120.0
+        winchoice.maxWidth = 120.0
 
             //val combo_box = ComboBox(sizes)
-        val combo = ComboBox(
-            FXCollections.observableList(sizes)
-        )
+        val combo = TextField()
+        combo.text = "12.0"
         val combofont = ComboBox<String>()
 
         var htmlstr = ""
 
         combofont.setValue(Font.getDefault().family)
         combofont.items.setAll(Font.getFamilies())
-        combo.selectionModel.select("12")
         combo.minWidth = 60.0
         combo.maxWidth = 60.0
-        combofont.minWidth = 100.0
-        combofont.maxWidth = 100.0
+        combofont.minWidth = 120.0
+        combofont.maxWidth = 120.0
 
-        val compilesize = ComboBox(
-            FXCollections.observableList(sizes)
-        )
+
         val compilefont = ComboBox<String>()
 
         compilefont.setValue(Font.getDefault().family)
         compilefont.items.setAll(Font.getFamilies())
-        compilesize.selectionModel.select("12")
-        compilesize.minWidth = 60.0
-        compilesize.maxWidth = 60.0
+
         compilefont.minWidth = 100.0
         compilefont.maxWidth = 100.0
 
+        var oldeditfont = Font.getDefault().family
+        var oldeditsize = "12.0"
+        var oldcompfont = Font.getDefault().family
+        var oldcompsize = "15.0"
         val toolbar = ToolBar(
-
             bold,
             italics,
             heading,
             strikethrough,
             compileMd,
+            winchoice,
+            minus,
             combo,
-            combofont,
-            compilesize,
+            plus,
             compilefont
         )
 
@@ -113,21 +120,13 @@ class Main : Application() {
                 "- Ability to save .txt files\n" +
                 "- File directory pane"
 
-        text.font = Font("Helvetica", 12.0)
+        text.font = Font(oldeditfont, oldeditsize.toDouble())
         text.prefColumnCount = 200
         val center = HBox(text)
         center.minWidth = 400.0
 
-        combo.valueProperty().addListener { _, _, newVal ->
-            text.font = Font("Helvetica", newVal.toDouble())
-        }
-        combofont.valueProperty().addListener { _, _, newVal ->
-            text.font = Font(newVal, text.font.size)
-        }
-
-
         // code for status bar (bottom pane)
-        val label = Label("")
+        val label = Label("Start Typing to Get Statistics!")
         val status = HBox(label)
 
         // code for left pane
@@ -144,6 +143,7 @@ class Main : Application() {
         display_text.prefColumnCount = 200
         display_text.isEditable = false
         val right = webView
+
         // val right = HBox(display_text)
         //right.prefWidth = 650.0
 
@@ -180,13 +180,47 @@ class Main : Application() {
                 });
             })(); </html>"""
             htmlstr= html
+
             webView.engine.loadContent(html);
         }
-        compilesize.valueProperty().addListener { _, _, newVal ->
-            webView.engine.userStyleSheetLocation = "data:,body { font: " + newVal +"px " + compilefont.value + "; }";
+        webView.engine.userStyleSheetLocation = "data:,body { font: " + oldcompsize+ "px " + oldcompfont + "; }";
+        compiledat()
+        ///compilesize.valueProperty().addListener { _, _, newVal ->
+        //    webView.engine.userStyleSheetLocation = "data:,body { font: " + newVal +"px " + compilefont.value + "; }";
+        //}
+
+        winchoice.valueProperty().addListener { _, _, newVal ->
+            if(newVal == "Edit Window"){
+                oldcompsize = combo.text
+                oldcompfont = compilefont.value
+                combo.text = text.font.size.toString()
+                compilefont.setValue(oldeditfont)
+            }else{
+                oldeditsize = combo.text
+                oldeditfont = compilefont.value
+                compilefont.setValue(oldcompfont)
+                combo.text = oldcompsize
+            }
+
         }
+
         compilefont.valueProperty().addListener { _, _, newVal ->
-            webView.engine.userStyleSheetLocation = "data:,body { font: " + compilesize.value +"px " + newVal + "; }";
+            if(winchoice.value == "Edit Window"){
+                text.font = Font(newVal, text.font.size)
+            }
+            else {
+                webView.engine.userStyleSheetLocation = "data:,body { font: " + combo.text + "px " + newVal + "; }";
+            }
+        }
+
+        combo.textProperty().addListener { _, _, newVal ->
+            if(winchoice.value == "Edit Window"){
+                text.font = Font(compilefont.value, newVal.toDouble())
+            }else {
+                val x = combo.text.toDouble()
+                webView.engine.userStyleSheetLocation =
+                    "data:,body { font: " + x.toString() + "px " + compilefont.value + "; }";
+            }
         }
 
         text.textProperty().addListener { observable, oldValue, newValue ->
@@ -232,6 +266,27 @@ class Main : Application() {
             }
             //text.insert("**" + currentHighlight + "**", text.getCaretPosition());
             text.replaceSelection("~~" + currentHighlight + "~~");
+        }
+        minus.setOnMouseClicked {
+            if(winchoice.value == "Edit Window"){
+                text.font = Font(text.font.style, text.font.size - 1)
+                combo.text = text.font.size.toString()
+            }else {
+                val x = combo.text.toDouble() - 1
+                combo.text = x.toString()
+                webView.engine.userStyleSheetLocation = "data:,body { font: " + x.toString()  +"px " + compilefont.value + "; }";
+            }
+
+        }
+        plus.setOnMouseClicked {
+            if(winchoice.value == "Edit Window"){
+                text.font = Font(text.font.style, text.font.size + 1)
+                combo.text = text.font.size.toString()
+            }else {
+                val x = combo.text.toDouble() + 1
+                combo.text = x.toString()
+                webView.engine.userStyleSheetLocation = "data:,body { font: " + x.toString()  +"px " + compilefont.value + "; }";
+            }
         }
 
 
@@ -336,7 +391,6 @@ class Main : Application() {
             } else {
                 savefilechooser.setInitialDirectory(File(userConfig.defaultFileLocation))
             }
-            println(savefilechooser.initialDirectory)
             val file = savefilechooser.showSaveDialog(Stage());
             if (file != null) {
                 try {
