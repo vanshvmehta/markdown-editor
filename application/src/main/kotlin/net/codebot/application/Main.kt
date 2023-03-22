@@ -13,6 +13,8 @@ import javafx.application.Application
 import javafx.event.EventHandler
 import javafx.scene.Scene
 import javafx.scene.control.*
+import javafx.scene.input.Clipboard
+import javafx.scene.input.ClipboardContent
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
@@ -25,6 +27,7 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintWriter
 import java.util.*
+
 
 class Main : Application() {
     override fun start(stage: Stage) {
@@ -280,6 +283,58 @@ class Main : Application() {
                     e.printStackTrace();
                 }
             }
+        }
+
+        // Cut, Copy, Paste
+        var clipboard: Clipboard = Clipboard.getSystemClipboard()
+        var content = ClipboardContent()
+        cut.isDisable = true
+        copy.isDisable = true
+        paste.isDisable = true
+
+        // check if Cut, Copy, Paste should be enabled
+        edit.showingProperty().addListener { obs, notShown, isShown ->
+            cut.isDisable = true
+            copy.isDisable = true
+            paste.isDisable = true
+
+            if (text.isFocused) {
+                if (text.selectedText != "") {
+                    cut.isDisable = false
+                    copy.isDisable = false
+                }
+                paste.isDisable = !clipboard.hasString()
+            }
+            else if (webView.isFocused) {
+                if (webView.getEngine().executeScript("window.getSelection().toString()")
+                            as String? != "") {
+                    copy.isDisable = false
+                }
+            }
+        }
+
+        cut.onAction = EventHandler {
+            var currentHighlight = text.selectedText
+            text.replaceSelection("")
+            content.putString(currentHighlight)
+            clipboard.setContent(content)
+        }
+
+        copy.onAction = EventHandler {
+            var currentHighlight: String? = ""
+            if (webView.isFocused) {
+                currentHighlight = webView.getEngine().
+                executeScript("window.getSelection().toString()") as String?
+            }
+            else {
+                currentHighlight = text.selectedText
+            }
+            content.putString(currentHighlight)
+            clipboard.setContent(content)
+        }
+
+        paste.onAction = EventHandler {
+            text.replaceSelection(clipboard.string)
         }
 
         // Themes function
