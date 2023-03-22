@@ -194,10 +194,12 @@ class Main : Application() {
         file.items.addAll(openFile, new, saveFile, exitApp)
 
         val edit = Menu("Edit")
+        val undo = MenuItem("Undo")
+        val redo = MenuItem("Redo")
         val cut = MenuItem("Cut")
         val copy = MenuItem("Copy")
         val paste = MenuItem("Paste")
-        edit.items.addAll(cut, copy, paste)
+        edit.items.addAll(undo, redo, cut, copy, paste)
 
         //Create SubMenu Help.
         //Create SubMenu Help.
@@ -283,6 +285,27 @@ class Main : Application() {
                     e.printStackTrace();
                 }
             }
+        }
+
+        // Undo, Redo
+        undo.isDisable = true
+        redo.isDisable = true
+
+        // check if Undo and Redo should be enabled
+        text.undoableProperty().addListener {obs, cannotUndo, canUndo ->
+            undo.isDisable = !text.isUndoable
+        }
+
+        text.redoableProperty().addListener {obs, cannotRedo, canRedo ->
+            redo.isDisable = !text.isRedoable
+        }
+
+        undo.onAction = EventHandler {
+            text.undo()
+        }
+
+        redo.onAction = EventHandler {
+            text.redo()
         }
 
         // Cut, Copy, Paste
