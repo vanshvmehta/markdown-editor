@@ -59,7 +59,7 @@ class FolderView {
         val treeTable = TreeView<Any?>(rootItem)
         treeTable.getSelectionModel().selectedItemProperty().addListener { observable, oldValue, newValue ->
             if (newValue != null && newValue !== oldValue) {
-                val path = pathname + '\\' + newValue.value
+                val path = pathname + '/' + newValue.value
 
                 try {
                     val scanner = Scanner(File(path));
