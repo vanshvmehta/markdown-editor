@@ -20,6 +20,8 @@ import javafx.scene.text.Font
 import javafx.scene.web.WebView
 import javafx.stage.FileChooser
 import javafx.stage.Stage
+import net.codebot.api.DirectoryAPI
+import net.codebot.api.FileAPI
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintWriter
@@ -27,7 +29,10 @@ import java.util.*
 
 class Main : Application() {
     override fun start(stage: Stage) {
-
+        val api = DirectoryAPI()
+        api.getData("vansh", "")
+        val fileAPI = FileAPI()
+        fileAPI.putFile("vansh", "", "config.txt", "hello world 58!")
         //Config, setting up themeColor and default file location
         var userConfig = initConfig()
         // variables to know on startup? maybe user preferences etc.
