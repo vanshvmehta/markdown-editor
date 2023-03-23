@@ -83,8 +83,12 @@ class Main : Application() {
         val label = Label("")
         val status = HBox(label)
 
+
         // code for left pane
-        val tree = FolderView().build()
+        val tree = FolderView().build(text)
+
+
+
         val left = tree
         left.prefWidth = 200.0
 
@@ -281,7 +285,7 @@ class Main : Application() {
                 filechooser.setInitialDirectory(File(userConfig.defaultFileLocation))
             }
 
-            val selectedFile = filechooser.showOpenDialog(stage);
+            val selectedFile = filechooser.showOpenDialog(stage)
             try {
                 val scanner = Scanner(selectedFile);
                 text.clear()
@@ -291,7 +295,7 @@ class Main : Application() {
             } catch (e: FileNotFoundException) {
                 e.printStackTrace();
             }
-            border.left = FolderView().build(selectedFile.parentFile.absolutePath,true)
+            border.left = FolderView().build(text, selectedFile.parentFile.absolutePath,true)
             border.left.getStyleClass().add("folder-view")
             userConfig = updateFileLocationConfig(userConfig, selectedFile.parentFile.absolutePath)
         }
@@ -417,4 +421,5 @@ class Main : Application() {
         stage.scene = scene
         stage.show()
     }
+
 }
