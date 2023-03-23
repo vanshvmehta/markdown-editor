@@ -99,7 +99,7 @@ class Main : Application() {
         fun compiledat(){
             val document: Node = parser.parse(text.text)
             var html = renderer.render(document)
-            System.out.println(html);
+            // System.out.println(html);
             html = """
                 <!DOCTYPE html>
             <!-- KaTeX requires the use of the HTML5 doctype. Without it, KaTeX may not render properly -->
