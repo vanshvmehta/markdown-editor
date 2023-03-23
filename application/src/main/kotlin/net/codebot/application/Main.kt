@@ -13,12 +13,10 @@ import javafx.application.Application
 import javafx.event.EventHandler
 import javafx.scene.Scene
 import javafx.scene.control.*
-import javafx.scene.input.Clipboard
-import javafx.scene.input.ClipboardContent
+import javafx.scene.input.*
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
-import javafx.scene.paint.Color
 import javafx.scene.text.Font
 import javafx.scene.web.WebView
 import javafx.stage.FileChooser
@@ -136,11 +134,11 @@ class Main : Application() {
             compiledat()
         }
 
-        compileMd.setOnMouseClicked {
+        compileMd.onAction = EventHandler {
             compiledat()
         }
 
-        bold.setOnMouseClicked {
+        bold.onAction = EventHandler {
             var currentHighlight = text.selectedText
             if (currentHighlight == "") {
                 currentHighlight = "strong text"
@@ -148,7 +146,7 @@ class Main : Application() {
             //text.insert("**" + currentHighlight + "**", text.getCaretPosition());
             text.replaceSelection("**" + currentHighlight + "**");
         }
-        italics.setOnMouseClicked {
+        italics.onAction = EventHandler {
             var currentHighlight = text.selectedText
             if (currentHighlight == "") {
                 currentHighlight = "emphasized text"
@@ -157,7 +155,7 @@ class Main : Application() {
             text.replaceSelection("*" + currentHighlight + "*");
         }
 
-        heading.setOnMouseClicked {
+        heading.onAction = EventHandler {
             var currentHighlight = text.selectedText
             if (currentHighlight == "") {
                 currentHighlight = "Heading"
@@ -165,7 +163,7 @@ class Main : Application() {
             //text.insert("**" + currentHighlight + "**", text.getCaretPosition());
             text.replaceSelection("## " + currentHighlight);
         }
-        strikethrough.setOnMouseClicked {
+        strikethrough.onAction = EventHandler {
             var currentHighlight = text.selectedText
             if (currentHighlight == "") {
                 currentHighlight = "strikethrough text"
@@ -238,6 +236,38 @@ class Main : Application() {
 
             // compiled area
             webView.engine.setUserStyleSheetLocation("file:src\\main\\resources\\" + cur_theme)
+        }
+
+        // Shortcuts for Menu Items
+        openFile.accelerator = KeyCombination.keyCombination("Ctrl+O")
+        new.accelerator = KeyCombination.keyCombination("Ctrl+N")
+        saveFile.accelerator = KeyCombination.keyCombination("Ctrl+S")
+        undo.accelerator = KeyCombination.keyCombination("Ctrl+Z")
+        redo.accelerator = KeyCombination.keyCombination("Ctrl+Y")
+        cut.accelerator = KeyCombination.keyCombination("Ctrl+X")
+        copy.accelerator = KeyCombination.keyCombination("Ctrl+C")
+        paste.accelerator = KeyCombination.keyCombination("Ctrl+V")
+
+        // Shortcuts for Buttons
+        val bold_combo: KeyCombination = KeyCodeCombination(KeyCode.B,
+            KeyCombination.CONTROL_DOWN, KeyCodeCombination.SHIFT_DOWN)
+        val italic_combo: KeyCombination = KeyCodeCombination(KeyCode.I,
+            KeyCombination.CONTROL_DOWN, KeyCodeCombination.SHIFT_DOWN)
+        val heading_combo: KeyCombination = KeyCodeCombination(KeyCode.H,
+            KeyCombination.CONTROL_DOWN, KeyCodeCombination.SHIFT_DOWN)
+        val strikethrough_combo: KeyCombination = KeyCodeCombination(KeyCode.S,
+            KeyCombination.CONTROL_DOWN, KeyCodeCombination.SHIFT_DOWN)
+        val compile_combo: KeyCombination = KeyCodeCombination(KeyCode.R,
+            KeyCombination.CONTROL_DOWN)
+
+        border.setOnKeyPressed {
+                when (true) {
+                    bold_combo.match(it) -> strikethrough.fire()
+                    italic_combo.match(it) -> italics.fire()
+                    heading_combo.match(it) -> heading.fire()
+                    strikethrough_combo.match(it) -> strikethrough.fire()
+                    compile_combo.match(it) -> compileMd.fire()
+                }
         }
 
         //OpenFile function
