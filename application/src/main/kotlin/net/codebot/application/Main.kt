@@ -239,7 +239,13 @@ class Main : Application() {
             left.getStyleClass().add("folder-view")
 
             // compiled area
-            webView.engine.setUserStyleSheetLocation("file:src\\main\\resources\\" + cur_theme)
+            if (cur_theme == "darkMode.css") {
+                webView.engine.
+                setUserStyleSheetLocation("data:,body { color:#FFFFFF; background-color: #707070; }")
+            } else if (cur_theme == "lightMode.css") {
+                webView.engine.
+                setUserStyleSheetLocation("data:,body {}")
+            }
         }
 
         // Shortcuts for Menu Items
