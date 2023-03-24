@@ -1,16 +1,19 @@
 package net.codebot.application
 import javafx.scene.Node
+import javafx.scene.control.TextArea
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.StackPane
 import java.io.File
+import java.io.FileNotFoundException
 import java.lang.Integer.min
-import kotlin.math.max
+import java.util.*
+
 
 class FolderView {
-    fun build(pathname: String = "No Working Directory", dir_selected: Boolean = false) : StackPane {
+    fun build(text: TextArea, pathname: String = "No Working Directory", dir_selected: Boolean = false) : StackPane {
         // images for file directory
         val folder_icon = ImageView(Image("https://www.iconpacks.net/icons/2/free-folder-icon-1485-thumb.png"))
         val image_icon = ImageView(Image("https://cdn-icons-png.flaticon.com/512/1160/1160358.png"))
@@ -53,6 +56,24 @@ class FolderView {
             }
             rootItem.children.removeLast()
         }
-        return StackPane(TreeView<Any?>(rootItem))
+        val treeTable = TreeView<Any?>(rootItem)
+        treeTable.getSelectionModel().selectedItemProperty().addListener { observable, oldValue, newValue ->
+            if (newValue != null && newValue !== oldValue) {
+                val path = pathname + '/' + newValue.value
+
+                try {
+                    val scanner = Scanner(File(path));
+                    text.clear()
+                        while (scanner.hasNextLine()) {
+                            text.appendText(scanner.nextLine() + "\n");
+                    }
+                } catch (e: FileNotFoundException) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return StackPane(treeTable)
     }
 }
+
