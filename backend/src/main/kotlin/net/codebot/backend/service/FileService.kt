@@ -36,7 +36,11 @@ class FileService {
                 Files.createDirectory(Paths.get(directoryPath))
             }
 
-            val completePath = "$basePath/$user/$path/$name"
+            var completePath = "$basePath/$user/$path/$name"
+            if (path == "") completePath = "$basePath/$user/$name"
+
+            println("Path: $completePath")
+
             Files.createFile(Paths.get(completePath))
             File(completePath).writeText(content)
 
