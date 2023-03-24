@@ -1,5 +1,4 @@
 package net.codebot.application
-import com.vladsch.flexmark.profile.pegdown.Extensions
 
 import com.vladsch.flexmark.ext.emoji.EmojiExtension
 import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension
@@ -9,6 +8,7 @@ import com.vladsch.flexmark.ext.toc.TocExtension
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.pdf.converter.PdfConverterExtension
+import com.vladsch.flexmark.profile.pegdown.Extensions
 import com.vladsch.flexmark.profile.pegdown.PegdownOptionsAdapter
 import com.vladsch.flexmark.util.ast.Node
 import com.vladsch.flexmark.util.data.MutableDataSet
@@ -26,6 +26,7 @@ import javafx.scene.text.Font
 import javafx.scene.web.WebView
 import javafx.stage.FileChooser
 import javafx.stage.Stage
+import javafx.util.converter.DoubleStringConverter
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintWriter
@@ -68,31 +69,30 @@ class Main : Application() {
 
             //val combo_box = ComboBox(sizes)
         val combo = TextField()
+
+        combo.setTextFormatter(TextFormatter(DoubleStringConverter()))
         combo.text = "12.0"
-        val combofont = ComboBox<String>()
-
         var htmlstr = ""
-
-        combofont.setValue(Font.getDefault().family)
-        combofont.items.setAll(Font.getFamilies())
-        combo.minWidth = 60.0
-        combo.maxWidth = 60.0
-        combofont.minWidth = 120.0
-        combofont.maxWidth = 120.0
-
-
-        val compilefont = ComboBox<String>()
-
-        compilefont.setValue(Font.getDefault().family)
-        compilefont.items.setAll(Font.getFamilies())
-
-        compilefont.minWidth = 100.0
-        compilefont.maxWidth = 100.0
 
         var oldeditfont = Font.getDefault().family
         var oldeditsize = "12.0"
         var oldcompfont = Font.getDefault().family
         var oldcompsize = "15.0"
+
+
+        combo.minWidth = 60.0
+        combo.maxWidth = 60.0
+
+
+        val compilefont = ComboBox<String>()
+
+        compilefont.setValue(oldcompfont)
+        compilefont.items.setAll(Font.getFamilies())
+
+        compilefont.minWidth = 100.0
+        compilefont.maxWidth = 100.0
+
+
         val toolbar = ToolBar(
 
             bold,
@@ -179,7 +179,9 @@ class Main : Application() {
 
             webView.engine.loadContent(html);
         }
-        webView.engine.userStyleSheetLocation = "data:,body { font: " + oldcompsize+ "px " + oldcompfont + "; }";
+        webView.engine.userStyleSheetLocation =
+        "data:,body { color:#FFFFFF; background-color: #707070;" +
+                " font:" + oldcompsize + "px " + oldcompfont + "; }"
         compiledat()
         ///compilesize.valueProperty().addListener { _, _, newVal ->
         //    webView.engine.userStyleSheetLocation = "data:,body { font: " + newVal +"px " + compilefont.value + "; }";
@@ -194,8 +196,17 @@ class Main : Application() {
             }else{
                 oldeditsize = combo.text
                 oldeditfont = compilefont.value
-                compilefont.setValue(oldcompfont)
                 combo.text = oldcompsize
+                compilefont.setValue(oldcompfont)
+
+                if (cur_theme == "darkMode.css"){
+                    webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
+                            " font:" + combo.text + "px " + compilefont + "; }"
+                    println("REACHED")
+                } else {
+                    webView.engine.userStyleSheetLocation = "data:,body { font: " + combo.text + "px " + compilefont + "; }";
+                    println("reached light theme")
+                }
             }
 
         }
@@ -203,9 +214,17 @@ class Main : Application() {
         compilefont.valueProperty().addListener { _, _, newVal ->
             if(winchoice.value == "Edit Window"){
                 text.font = Font(newVal, text.font.size)
+                println("hit edit window")
             }
             else {
-                webView.engine.userStyleSheetLocation = "data:,body { font: " + combo.text + "px " + newVal + "; }";
+                if (cur_theme == "darkMode.css"){
+                    webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
+                            " font:" + combo.text + "px " + newVal + "; }"
+                    println("REACHED")
+                } else {
+                    webView.engine.userStyleSheetLocation = "data:,body { font: " + combo.text + "px " + newVal + "; }";
+                    println("reached light theme")
+                }
             }
         }
 
@@ -270,7 +289,14 @@ class Main : Application() {
             }else {
                 val x = combo.text.toDouble() - 1
                 combo.text = x.toString()
-                webView.engine.userStyleSheetLocation = "data:,body { font: " + x.toString()  +"px " + compilefont.value + "; }";
+                if (cur_theme == "darkMode.css") {
+                    webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
+                            " font:" + x.toString() + "px " + compilefont.value + "; }"
+                } else {
+                    webView.engine.userStyleSheetLocation =
+                        "data:,body { font: " + x.toString() + "px " + compilefont.value + "; }"
+                }
+
             }
 
         }
@@ -281,7 +307,14 @@ class Main : Application() {
             }else {
                 val x = combo.text.toDouble() + 1
                 combo.text = x.toString()
-                webView.engine.userStyleSheetLocation = "data:,body { font: " + x.toString()  +"px " + compilefont.value + "; }";
+                if (cur_theme == "darkMode.css") {
+                    webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
+                            " font:" + x.toString() + "px " + compilefont.value + "; }"
+                } else {
+                    webView.engine.userStyleSheetLocation =
+                        "data:,body { font: " + x.toString() + "px " + compilefont.value + "; }"
+                }
+
             }
         }
 
@@ -353,10 +386,11 @@ class Main : Application() {
             // compiled area
             if (cur_theme == "darkMode.css") {
                 webView.engine.
-                setUserStyleSheetLocation("data:,body { color:#FFFFFF; background-color: #707070; }")
+                setUserStyleSheetLocation("data:,body { color:#FFFFFF; background-color: #707070;" +
+                        " font:" + oldcompsize + "px " + oldcompfont + "; }")
             } else if (cur_theme == "lightMode.css") {
                 webView.engine.
-                setUserStyleSheetLocation("data:,body {}")
+                setUserStyleSheetLocation("data:,body {font:" + oldcompsize + "px " + oldcompfont + ";}")
             }
         }
 
@@ -533,11 +567,25 @@ class Main : Application() {
         // Themes function
         themesLight.onAction = EventHandler {
             cur_theme = "lightMode.css"
+            if(winchoice.value == "Edit Window"){
+                oldcompsize = combo.text
+                oldcompfont = compilefont.value
+            }else{
+                oldeditsize = combo.text
+                oldeditfont = compilefont.value
+            }
             setThemes()
         }
 
         themesDark.onAction = EventHandler {
             cur_theme = "darkMode.css"
+            if(winchoice.value == "Edit Window"){
+                oldcompsize = combo.text
+                oldcompfont = compilefont.value
+            }else{
+                oldeditsize = combo.text
+                oldeditfont = compilefont.value
+            }
             setThemes()
         }
 
