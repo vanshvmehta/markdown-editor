@@ -13,7 +13,12 @@ import java.util.*
 
 
 class FolderView {
-    fun build(text: TextArea, pathname: String = "No Working Directory", dir_selected: Boolean = false) : StackPane {
+
+    // track current open file
+    data class cur_File (
+        var path2file: String? = null
+    )
+    fun build(text: TextArea, cur_file: cur_File, pathname: String = "No Working Directory", dir_selected: Boolean = false) : StackPane {
         // images for file directory
         val folder_icon = ImageView(Image("https://www.iconpacks.net/icons/2/free-folder-icon-1485-thumb.png"))
         val image_icon = ImageView(Image("https://cdn-icons-png.flaticon.com/512/1160/1160358.png"))
@@ -67,6 +72,7 @@ class FolderView {
                         while (scanner.hasNextLine()) {
                             text.appendText(scanner.nextLine() + "\n");
                     }
+                    update_current_file(cur_file, path)
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace();
                 }
@@ -74,6 +80,10 @@ class FolderView {
         }
 
         return StackPane(treeTable)
+    }
+
+    private fun update_current_file(cur_File: FolderView.cur_File, newPath: String) {
+        cur_File.path2file = newPath
     }
 }
 
