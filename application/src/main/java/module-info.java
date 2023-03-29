@@ -17,5 +17,6 @@ module application {
     requires flexmark.pdf.converter;
     requires flexmark.profile.pegdown;
     requires flexmark.ext.toc;
+    requires java.net.http;
     exports net.codebot.application;
 }
