@@ -201,10 +201,10 @@ class Main : Application() {
 
                 if (cur_theme == "darkMode.css"){
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
-                            " font:" + combo.text + "px " + compilefont + "; }"
+                            " font:" + combo.text + "px " + oldcompfont + "; }"
                     println("REACHED")
                 } else {
-                    webView.engine.userStyleSheetLocation = "data:,body { font: " + combo.text + "px " + compilefont + "; }";
+                    webView.engine.userStyleSheetLocation = "data:,body { font: " + combo.text + "px " + oldcompfont + "; }";
                     println("reached light theme")
                 }
             }
