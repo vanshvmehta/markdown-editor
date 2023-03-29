@@ -198,6 +198,7 @@ class Main : Application() {
                 oldeditfont = compilefont.value
                 combo.text = oldcompsize
                 compilefont.setValue(oldcompfont)
+                //test
 
                 if (cur_theme == "darkMode.css"){
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
