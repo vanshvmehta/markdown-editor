@@ -41,6 +41,8 @@ class Main : Application() {
         // variables to know on startup? maybe user preferences etc.
         var cur_theme = "darkMode.css"
 
+
+        var cur_file: FolderView.cur_File = FolderView.cur_File()
         val bold = Button("B")
         val italics = Button("I")
         val heading = Button("H")
@@ -132,7 +134,7 @@ class Main : Application() {
         val status = HBox(label)
 
         // code for left pane
-        val tree = FolderView().build(text)
+        val tree = FolderView().build(text, cur_file)
 
 
 
@@ -198,12 +200,10 @@ class Main : Application() {
                 oldeditfont = compilefont.value
                 combo.text = oldcompsize
                 compilefont.setValue(oldcompfont)
-                //test
 
                 if (cur_theme == "darkMode.css"){
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
                             " font:" + combo.text + "px " + oldcompfont + "; }"
-                    println("REACHED")
                 } else {
                     webView.engine.userStyleSheetLocation = "data:,body { font: " + combo.text + "px " + oldcompfont + "; }";
                     println("reached light theme")
@@ -323,7 +323,7 @@ class Main : Application() {
         bold.setTooltip( Tooltip("Bold - Meta+Shift+B"))
         italics.setTooltip( Tooltip("Italic - Meta+Shift+I"))
         heading.setTooltip( Tooltip("Heading - Meta+Shift+H"))
-        strikethrough.setTooltip( Tooltip("Strikethrough - Meta+Shift+S"))
+        strikethrough.setTooltip( Tooltip("Strikethrough - Meta+5"))
         compileMd.setTooltip( Tooltip("Compile Markdown - Meta+R"))
 
         val border = BorderPane()
@@ -334,12 +334,13 @@ class Main : Application() {
         val file = Menu("File")
         val openFile = MenuItem("Open File")
         val new = MenuItem("New")
+        val saveAsFile = MenuItem("Save As")
         val saveFile = MenuItem("Save")
         val saveas = Menu("Save As")
         val savepdf = MenuItem(".pdf")
         saveas.items.addAll(savepdf)
         val exitApp = MenuItem("Exit")
-        file.items.addAll(openFile, new, saveFile, saveas, exitApp)
+        file.items.addAll(openFile, new, saveFile, saveAsFile, exitApp)
 
         val edit = Menu("Edit")
         val undo = MenuItem("Undo")
@@ -399,6 +400,7 @@ class Main : Application() {
         openFile.accelerator = KeyCombination.keyCombination("Ctrl+O")
         new.accelerator = KeyCombination.keyCombination("Ctrl+N")
         saveFile.accelerator = KeyCombination.keyCombination("Ctrl+S")
+        saveAsFile.accelerator = KeyCombination.keyCombination("Ctrl+Shift+S")
         undo.accelerator = KeyCombination.keyCombination("Ctrl+Z")
         redo.accelerator = KeyCombination.keyCombination("Ctrl+Y")
         cut.accelerator = KeyCombination.keyCombination("Ctrl+X")
@@ -412,8 +414,8 @@ class Main : Application() {
             KeyCombination.CONTROL_DOWN, KeyCodeCombination.SHIFT_DOWN)
         val heading_combo: KeyCombination = KeyCodeCombination(KeyCode.H,
             KeyCombination.CONTROL_DOWN, KeyCodeCombination.SHIFT_DOWN)
-        val strikethrough_combo: KeyCombination = KeyCodeCombination(KeyCode.S,
-            KeyCombination.CONTROL_DOWN, KeyCodeCombination.SHIFT_DOWN)
+        val strikethrough_combo: KeyCombination = KeyCodeCombination(KeyCode.DIGIT5,
+            KeyCombination.CONTROL_DOWN)
         val compile_combo: KeyCombination = KeyCodeCombination(KeyCode.R,
             KeyCombination.CONTROL_DOWN)
 
@@ -448,13 +450,27 @@ class Main : Application() {
             } catch (e: FileNotFoundException) {
                 e.printStackTrace();
             }
-            border.left = FolderView().build(text, selectedFile.parentFile.absolutePath,true)
+            border.left = FolderView().build(text, cur_file, selectedFile.parentFile.absolutePath,true)
             border.left.getStyleClass().add("folder-view")
+            cur_file.path2file = selectedFile.absolutePath
             userConfig = updateFileLocationConfig(userConfig, selectedFile.parentFile.absolutePath)
         }
 
-        //SaveFile function
+        //SaveFile Function
         saveFile.onAction = EventHandler {
+            if (cur_file.path2file != null) {
+                try {
+                    val printWriter = PrintWriter(cur_file.path2file)
+                    printWriter.write(text.text);
+                    printWriter.close();
+                } catch (e: FileNotFoundException) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        //SaveAsFile function
+        saveAsFile.onAction = EventHandler {
             val savefilechooser = FileChooser()
 
             if (userConfig.defaultFileLocation == "user.home") {
@@ -565,6 +581,7 @@ class Main : Application() {
         paste.onAction = EventHandler {
             text.replaceSelection(clipboard.string)
         }
+
         // Themes function
         themesLight.onAction = EventHandler {
             cur_theme = "lightMode.css"
