@@ -11,13 +11,17 @@ import com.vladsch.flexmark.util.data.MutableDataSet
 import com.vladsch.flexmark.util.misc.Extension
 import javafx.application.Application
 import javafx.event.EventHandler
+import javafx.geometry.Insets
+import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.input.*
 import javafx.scene.layout.BorderPane
+import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
+import javafx.scene.text.Text
 import javafx.scene.web.WebView
 import javafx.stage.FileChooser
 import javafx.stage.Stage
@@ -34,7 +38,8 @@ class Main : Application() {
         var userConfig = initConfig()
         // variables to know on startup? maybe user preferences etc.
         var cur_theme = "darkMode.css"
-
+        // stage for login window
+        val loginStage = Stage()
 
         var cur_file: FolderView.cur_File = FolderView.cur_File()
         val bold = Button("B")
@@ -195,8 +200,9 @@ class Main : Application() {
         val new = MenuItem("New")
         val saveAsFile = MenuItem("Save As")
         val saveFile = MenuItem("Save")
+        val signOut = MenuItem("Sign Out")
         val exitApp = MenuItem("Exit")
-        file.items.addAll(openFile, new, saveFile, saveAsFile, exitApp)
+        file.items.addAll(openFile, new, saveFile, saveAsFile, signOut,exitApp)
 
         val edit = Menu("Edit")
         val undo = MenuItem("Undo")
@@ -345,7 +351,12 @@ class Main : Application() {
             }
         }
 
-
+        signOut.onAction = EventHandler {
+            stage.hide()
+            loginStage.show()
+            loginStage.scene = Scene(LoginManager().build(loginStage, stage))
+            // reset stage as well
+        }
 
         // Undo, Redo
         undo.isDisable = true
@@ -445,7 +456,12 @@ class Main : Application() {
         stage.height = 450.0
         stage.title = "Markdown Editor"
         stage.scene = scene
-        stage.show()
-    }
+        stage.hide()
 
+        // authentication box
+        val loginScene = Scene(LoginManager().build(loginStage, stage))
+        loginStage.scene = loginScene
+        loginStage.title = "User Login"
+        loginStage.show()
+    }
 }
