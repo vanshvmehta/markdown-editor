@@ -56,3 +56,20 @@ html {
     -fx-background-color: #707070;
     -fx-text-fill: #FFFFFF;
 }
+
+.tool-bar .text-field{
+    -fx-background-color: #707070;
+    -fx-text-fill: #FFFFFF;
+}
+
+.tool-bar .combo-box-base{
+    -fx-background-color: #707070;
+    -fx-body-color: #FFFFFF;
+    -fx-text-fill: #FFFFFF;
+    -fx-control-inner-background: #707070;
+}
+
+.tool-bar .combo-box-base .text {
+    -fx-fill: #FFFFFF;
+}
+
