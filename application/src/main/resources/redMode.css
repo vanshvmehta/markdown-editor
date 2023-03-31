@@ -1,0 +1,75 @@
+html {
+    color: #FFFFFF;
+    background-color: #707070;
+}
+
+.text-area{
+    -fx-control-inner-background: #707070;
+    -fx-text-fill: #FFFFFF;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.text-area .scroll-bar{
+    -fx-background-color: #707070;
+}
+
+.folder-view{
+    -fx-control-inner-background: #707070;
+    -fx-text-fill: #FFFFFF;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-selection-bar: #969A9F;
+}
+
+.folder-view .scroll-bar{
+    -fx-background-color: #707070;
+}
+
+.status-text{
+    -fx-text-fill: #FFFFFF;
+}
+
+.status-bar{
+    -fx-background-color: #3B3B3B;
+}
+
+.menu .label{
+    -fx-control-inner-background: #707070;
+    -fx-text-fill: #FFFFFF;
+}
+
+.menu-bar{
+    -fx-background-color: #3B3B3B;
+    -fx-control-inner-background: #707070;
+    -fx-selection-bar: #969A9F;
+}
+.menu-item:focused{
+     -fx-background-color: #969A9F;
+}
+
+.tool-bar{
+    -fx-background-color: #3B3B3B;
+}
+
+.tool-bar .button{
+    -fx-background-color: #707070;
+    -fx-text-fill: #FFFFFF;
+}
+
+.tool-bar .text-field{
+    -fx-background-color: #707070;
+    -fx-text-fill: #FFFFFF;
+}
+
+.tool-bar .combo-box-base{
+    -fx-background-color: #707070;
+    -fx-body-color: #FFFFFF;
+    -fx-text-fill: #FFFFFF;
+    -fx-control-inner-background: #707070;
+}
+
+.tool-bar .combo-box-base .text {
+    -fx-fill: #FFFFFF;
+}
+

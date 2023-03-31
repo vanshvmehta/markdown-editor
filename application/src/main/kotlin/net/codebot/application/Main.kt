@@ -39,7 +39,7 @@ class Main : Application() {
         //Config, setting up themeColor and default file location
         var userConfig = initConfig()
         // variables to know on startup? maybe user preferences etc.
-        var cur_theme = "darkMode.css"
+        var cur_theme = "redMode.css"
 
 
         var cur_file: FolderView.cur_File = FolderView.cur_File()
@@ -195,14 +195,17 @@ class Main : Application() {
                 oldcompfont = compilefont.value
                 combo.text = text.font.size.toString()
                 compilefont.setValue(oldeditfont)
-            }else{
+            }else {
                 oldeditsize = combo.text
                 oldeditfont = compilefont.value
                 combo.text = oldcompsize
                 compilefont.setValue(oldcompfont)
 
-                if (cur_theme == "darkMode.css"){
+                if (cur_theme == "darkMode.css") {
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
+                            " font:" + combo.text + "px " + oldcompfont + "; }"
+                } else if (cur_theme == "nightBlue.css") {
+                    webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
                             " font:" + combo.text + "px " + oldcompfont + "; }"
                 } else {
                     webView.engine.userStyleSheetLocation = "data:,body { font: " + combo.text + "px " + oldcompfont + "; }";
@@ -222,6 +225,9 @@ class Main : Application() {
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
                             " font:" + combo.text + "px " + newVal + "; }"
                     println("REACHED")
+                } else if (cur_theme == "nightBlue.css") {
+                    webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
+                            " font:" + combo.text + "px " + newVal + "; }"
                 } else {
                     webView.engine.userStyleSheetLocation = "data:,body { font: " + combo.text + "px " + newVal + "; }";
                     println("reached light theme")
@@ -293,7 +299,10 @@ class Main : Application() {
                 if (cur_theme == "darkMode.css") {
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
                             " font:" + x.toString() + "px " + compilefont.value + "; }"
-                } else {
+                } else if (cur_theme == "nightBlue.css") {
+                    webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
+                            " font:" + x.toString() + "px " + compilefont.value + "; }"
+                }else {
                     webView.engine.userStyleSheetLocation =
                         "data:,body { font: " + x.toString() + "px " + compilefont.value + "; }"
                 }
@@ -310,6 +319,9 @@ class Main : Application() {
                 combo.text = x.toString()
                 if (cur_theme == "darkMode.css") {
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
+                            " font:" + x.toString() + "px " + compilefont.value + "; }"
+                } else if (cur_theme == "nightBlue.css") {
+                    webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
                             " font:" + x.toString() + "px " + compilefont.value + "; }"
                 } else {
                     webView.engine.userStyleSheetLocation =
@@ -356,7 +368,8 @@ class Main : Application() {
         val themes = Menu("Themes")
         val themesLight = MenuItem("Light Mode")
         val themesDark = MenuItem("Dark Mode")
-        themes.items.addAll(themesLight, themesDark)
+        val themesBlue = MenuItem("Night Blue")
+        themes.items.addAll(themesLight, themesDark, themesBlue)
         view.items.add(themes)
 
         mainMenu.getMenus().addAll(file, edit, view);
@@ -393,6 +406,10 @@ class Main : Application() {
             } else if (cur_theme == "lightMode.css") {
                 webView.engine.
                 setUserStyleSheetLocation("data:,body {font:" + oldcompsize + "px " + oldcompfont + ";}")
+            } else if (cur_theme == "nightBlue.css") {
+                webView.engine.
+                userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
+                        " font:" + oldcompsize + "px " + oldcompfont + "; }"
             }
         }
 
@@ -597,6 +614,18 @@ class Main : Application() {
 
         themesDark.onAction = EventHandler {
             cur_theme = "darkMode.css"
+            if(winchoice.value == "Edit Window"){
+                oldcompsize = combo.text
+                oldcompfont = compilefont.value
+            }else{
+                oldeditsize = combo.text
+                oldeditfont = compilefont.value
+            }
+            setThemes()
+        }
+
+        themesBlue.onAction = EventHandler {
+            cur_theme = "nightBlue.css"
             if(winchoice.value == "Edit Window"){
                 oldcompsize = combo.text
                 oldcompfont = compilefont.value
