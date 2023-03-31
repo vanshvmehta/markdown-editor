@@ -1,13 +1,16 @@
 package net.codebot.application
 import javafx.scene.Node
+import javafx.scene.control.TextArea
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
 import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.layout.StackPane
 import java.io.File
+import java.io.FileNotFoundException
 import java.lang.Integer.min
-import kotlin.math.max
+import java.util.*
+
 
 class FolderView {
 
