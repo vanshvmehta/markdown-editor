@@ -27,6 +27,7 @@ import javafx.scene.web.WebView
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import javafx.util.converter.DoubleStringConverter
+import net.codebot.api.verifyUser
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintWriter
@@ -35,6 +36,7 @@ import java.util.*
 
 class Main : Application() {
     override fun start(stage: Stage) {
+        println(verifyUser("dan", "oldPwd"))
 
         //Config, setting up themeColor and default file location
         var userConfig = initConfig()
