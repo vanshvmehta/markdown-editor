@@ -14,5 +14,9 @@ module application {
     requires flexmark.ext.emoji;
     requires kotlinx.serialization.core;
     requires kotlinx.serialization.json;
+    requires flexmark.pdf.converter;
+    requires flexmark.profile.pegdown;
+    requires flexmark.ext.toc;
+    requires java.net.http;
     exports net.codebot.application;
 }
