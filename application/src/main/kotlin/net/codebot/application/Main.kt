@@ -18,7 +18,6 @@ import javafx.collections.FXCollections
 import javafx.event.EventHandler
 import javafx.scene.Scene
 import javafx.scene.control.*
-import javafx.scene.input.*
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
@@ -31,7 +30,6 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintWriter
 import java.util.*
-
 
 class Main : Application() {
     override fun start(stage: Stage) {
@@ -143,7 +141,15 @@ class Main : Application() {
 
         // code for right pane
         val webView = WebView()
+        val display_text = TextArea()
+        display_text.isWrapText = true
+        display_text.text = "Compiled text goes here!"
+        display_text.font = Font("Helvetica", 12.0)
+        display_text.prefColumnCount = 200
+        display_text.isEditable = false
         val right = webView
+        // val right = HBox(display_text)
+        //right.prefWidth = 650.0
 
         fun compiledat(){
             val document: Node = parser.parse(text.text)
@@ -246,11 +252,11 @@ class Main : Application() {
             compiledat()
         }
 
-        compileMd.onAction = EventHandler {
+        compileMd.setOnMouseClicked {
             compiledat()
         }
 
-        bold.onAction = EventHandler {
+        bold.setOnMouseClicked {
             var currentHighlight = text.selectedText
             if (currentHighlight == "") {
                 currentHighlight = "strong text"
@@ -258,7 +264,7 @@ class Main : Application() {
             //text.insert("**" + currentHighlight + "**", text.getCaretPosition());
             text.replaceSelection("**" + currentHighlight + "**");
         }
-        italics.onAction = EventHandler {
+        italics.setOnMouseClicked {
             var currentHighlight = text.selectedText
             if (currentHighlight == "") {
                 currentHighlight = "emphasized text"
@@ -267,7 +273,7 @@ class Main : Application() {
             text.replaceSelection("*" + currentHighlight + "*");
         }
 
-        heading.onAction = EventHandler {
+        heading.setOnMouseClicked {
             var currentHighlight = text.selectedText
             if (currentHighlight == "") {
                 currentHighlight = "Heading"
@@ -275,7 +281,7 @@ class Main : Application() {
             //text.insert("**" + currentHighlight + "**", text.getCaretPosition());
             text.replaceSelection("## " + currentHighlight);
         }
-        strikethrough.onAction = EventHandler {
+        strikethrough.setOnMouseClicked {
             var currentHighlight = text.selectedText
             if (currentHighlight == "") {
                 currentHighlight = "strikethrough text"
@@ -343,12 +349,10 @@ class Main : Application() {
         file.items.addAll(openFile, new, saveFile, saveAsFile, exitApp)
 
         val edit = Menu("Edit")
-        val undo = MenuItem("Undo")
-        val redo = MenuItem("Redo")
         val cut = MenuItem("Cut")
         val copy = MenuItem("Copy")
         val paste = MenuItem("Paste")
-        edit.items.addAll(undo, redo, cut, copy, paste)
+        edit.items.addAll(cut, copy, paste)
 
         //Create SubMenu Help.
         //Create SubMenu Help.
@@ -440,7 +444,7 @@ class Main : Application() {
                 filechooser.setInitialDirectory(File(userConfig.defaultFileLocation))
             }
 
-            val selectedFile = filechooser.showOpenDialog(stage)
+            val selectedFile = filechooser.showOpenDialog(stage);
             try {
                 val scanner = Scanner(selectedFile);
                 text.clear()
