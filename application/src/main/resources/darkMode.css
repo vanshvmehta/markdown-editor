@@ -1,3 +1,8 @@
+html {
+    color: #FFFFFF;
+    background-color: #707070;
+}
+
 .text-area{
     -fx-control-inner-background: #707070;
     -fx-text-fill: #FFFFFF;
