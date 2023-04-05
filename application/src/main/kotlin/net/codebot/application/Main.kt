@@ -39,7 +39,7 @@ class Main : Application() {
         //Config, setting up themeColor and default file location
         var userConfig = initConfig()
         // variables to know on startup? maybe user preferences etc.
-        var cur_theme = "redMode.css"
+        var cur_theme = userConfig.theme
 
 
         var cur_file: FolderView.cur_File = FolderView.cur_File()
@@ -369,7 +369,8 @@ class Main : Application() {
         val themesLight = MenuItem("Light Mode")
         val themesDark = MenuItem("Dark Mode")
         val themesBlue = MenuItem("Night Blue")
-        themes.items.addAll(themesLight, themesDark, themesBlue)
+        val themesPurple = MenuItem("Quiet Light")
+        themes.items.addAll(themesLight, themesDark, themesBlue, themesPurple)
         view.items.add(themes)
 
         mainMenu.getMenus().addAll(file, edit, view);
@@ -382,6 +383,7 @@ class Main : Application() {
             // clear and attach new theme
             border.getStylesheets().clear()
             border.getStylesheets().add(cur_theme)
+            userConfig = updateColorThemeConfig(userConfig, cur_theme)
 
             // menu bars
             mainMenu.getStyleClass().add("menu-bar")
@@ -403,13 +405,13 @@ class Main : Application() {
                 webView.engine.
                 setUserStyleSheetLocation("data:,body { color:#FFFFFF; background-color: #707070;" +
                         " font:" + oldcompsize + "px " + oldcompfont + "; }")
-            } else if (cur_theme == "lightMode.css") {
-                webView.engine.
-                setUserStyleSheetLocation("data:,body {font:" + oldcompsize + "px " + oldcompfont + ";}")
             } else if (cur_theme == "nightBlue.css") {
                 webView.engine.
                 userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
                         " font:" + oldcompsize + "px " + oldcompfont + "; }"
+            } else {
+                webView.engine.
+                setUserStyleSheetLocation("data:,body {font:" + oldcompsize + "px " + oldcompfont + ";}")
             }
         }
 
@@ -599,40 +601,39 @@ class Main : Application() {
             text.replaceSelection(clipboard.string)
         }
 
+        // themes helper to save font size on switch
+        fun themes_font_helper() {
+            if (winchoice.value == "Edit Window") {
+                oldeditsize = combo.text
+                oldeditfont = compilefont.value
+            } else {
+                oldcompsize = combo.text
+                oldcompfont = compilefont.value
+            }
+        }
+
         // Themes function
         themesLight.onAction = EventHandler {
             cur_theme = "lightMode.css"
-            if(winchoice.value == "Edit Window"){
-                oldcompsize = combo.text
-                oldcompfont = compilefont.value
-            }else{
-                oldeditsize = combo.text
-                oldeditfont = compilefont.value
-            }
+            themes_font_helper()
             setThemes()
         }
 
         themesDark.onAction = EventHandler {
             cur_theme = "darkMode.css"
-            if(winchoice.value == "Edit Window"){
-                oldcompsize = combo.text
-                oldcompfont = compilefont.value
-            }else{
-                oldeditsize = combo.text
-                oldeditfont = compilefont.value
-            }
+            themes_font_helper()
             setThemes()
         }
 
         themesBlue.onAction = EventHandler {
             cur_theme = "nightBlue.css"
-            if(winchoice.value == "Edit Window"){
-                oldcompsize = combo.text
-                oldcompfont = compilefont.value
-            }else{
-                oldeditsize = combo.text
-                oldeditfont = compilefont.value
-            }
+            themes_font_helper()
+            setThemes()
+        }
+
+        themesPurple.onAction = EventHandler {
+            cur_theme = "quietLight.css"
+            themes_font_helper()
             setThemes()
         }
 
