@@ -14,12 +14,20 @@ import java.nio.file.Paths
 @Serializable
 data class UserSetting(
     var theme: String,
-    var defaultFileLocation: String
+    var defaultFileLocation: String,
+    var defaultWidth: Double,
+    var defaultHeight: Double,
+    var defaultFont: String,
+    var defaultSize: Int
 )
 
 //Check config file -> return user setting data class
 fun initConfig(): UserSetting {
-    var currSetting: UserSetting = UserSetting("", "")
+    var currSetting = UserSetting(
+        "","",
+        0.0, 0.0,
+        "", 0)
+
     val configFile = File(getConfigPath())
 
     //Check if Config File exists, if not, create a new default one
@@ -38,7 +46,10 @@ fun initConfig(): UserSetting {
         }
         println("Writing Default Config")
         //Default Config
-        updateConfig(UserSetting("light", "user.home"))
+        updateConfig(UserSetting(
+            "light", "user.home",
+            750.0, 450.0,
+            "System", 12))
     }
 
     try {
@@ -47,6 +58,7 @@ fun initConfig(): UserSetting {
         println("Parsing Config into Json")
         val json = Json {prettyPrint = true}
         currSetting = json.decodeFromString<UserSetting>(config)
+        // print(currSetting)
 
     } catch (e: IOException) {
         e.printStackTrace()
@@ -56,25 +68,10 @@ fun initConfig(): UserSetting {
     }
     return currSetting
 }
-public fun updateFileLocationConfig
-            (userSetting: UserSetting, newlocation: String) : UserSetting {
-    val newUserSetting = UserSetting(userSetting.theme, newlocation)
-    updateConfig(newUserSetting)
-    return newUserSetting
-}
-
-public fun updateColorThemeConfig
-            (userSetting: UserSetting, newTheme: String) : UserSetting {
-    val newUserSetting = UserSetting(newTheme, userSetting.defaultFileLocation)
-    updateConfig(newUserSetting)
-    return newUserSetting
-}
-
 
 private fun updateConfig(userSetting: UserSetting) {
     val configFile = File(getConfigPath())
     println("Attempting to Update Config File: " + configFile.toString())
-
     try {
         println("Converting Properties to Json")
         val json = Json {prettyPrint = true}
@@ -97,3 +94,78 @@ private fun getConfigPath(): String? {
     return resolvedPath.toString()
 }
 
+public fun updateColorThemeConfig
+            (userSetting: UserSetting, newTheme: String) : UserSetting {
+    val newUserSetting =
+        UserSetting(theme = newTheme,
+            defaultFileLocation = userSetting.defaultFileLocation,
+            defaultWidth = userSetting.defaultWidth,
+            defaultHeight = userSetting.defaultHeight,
+            defaultFont = userSetting.defaultFont,
+            defaultSize = userSetting.defaultSize)
+    updateConfig(newUserSetting)
+    return newUserSetting
+}
+public fun updateFileLocationConfig
+            (userSetting: UserSetting, newlocation: String) : UserSetting {
+    val newUserSetting =
+        UserSetting(theme = userSetting.theme,
+            defaultFileLocation = newlocation,
+            defaultWidth = userSetting.defaultWidth,
+            defaultHeight = userSetting.defaultHeight,
+            defaultFont = userSetting.defaultFont,
+            defaultSize = userSetting.defaultSize)
+    updateConfig(newUserSetting)
+    return newUserSetting
+}
+
+public fun updateWidthConfig
+            (userSetting: UserSetting, newWidth: Double) : UserSetting {
+    val newUserSetting =
+        UserSetting(theme = userSetting.theme,
+            defaultFileLocation = userSetting.defaultFileLocation,
+            defaultWidth = newWidth,
+            defaultHeight = userSetting.defaultHeight,
+            defaultFont = userSetting.defaultFont,
+            defaultSize = userSetting.defaultSize)
+    updateConfig(newUserSetting)
+    return newUserSetting
+}
+public fun updateHeightConfig
+            (userSetting: UserSetting, newHeight: Double) : UserSetting {
+    val newUserSetting =
+        UserSetting(theme = userSetting.theme,
+            defaultFileLocation = userSetting.defaultFileLocation,
+            defaultWidth = userSetting.defaultWidth,
+            defaultHeight = newHeight,
+            defaultFont = userSetting.defaultFont,
+            defaultSize = userSetting.defaultSize)
+    updateConfig(newUserSetting)
+    return newUserSetting
+}
+
+public fun updateFontConfig
+            (userSetting: UserSetting, newFont: String) : UserSetting {
+    val newUserSetting =
+        UserSetting(theme = userSetting.theme,
+            defaultFileLocation = userSetting.defaultFileLocation,
+            defaultWidth = userSetting.defaultWidth,
+            defaultHeight = userSetting.defaultHeight,
+            defaultFont = newFont,
+            defaultSize = userSetting.defaultSize)
+    updateConfig(newUserSetting)
+    return newUserSetting
+}
+
+public fun updateSizeConfig
+            (userSetting: UserSetting, newSize: Int) : UserSetting {
+    val newUserSetting =
+        UserSetting(theme = userSetting.theme,
+            defaultFileLocation = userSetting.defaultFileLocation,
+            defaultWidth = userSetting.defaultWidth,
+            defaultHeight = userSetting.defaultHeight,
+            defaultFont = userSetting.defaultFont,
+            defaultSize = newSize)
+    updateConfig(newUserSetting)
+    return newUserSetting
+}
