@@ -14,6 +14,7 @@ import javafx.scene.layout.StackPane
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
 import javafx.stage.Stage
+import net.codebot.api.getDirectory
 import net.codebot.api.verifyUser
 
 
@@ -64,13 +65,18 @@ class LoginManager {
             } else if (password == "") {
                 actiontarget.setText("Enter a password.")
             } else {
-                val verified = verifyUser(user, password)
-                if (verified) {
-                    markdown.show()
-                    self.hide()
-                } else {
-                    actiontarget.setText("Invalid password.")
+                val rootData = getDirectory(user, "root").body
+                for (obj: Map<String, String> in rootData) {
+                    println(obj)
                 }
+
+//                val verified = verifyUser(user, password)
+//                if (verified) {
+//                    markdown.show()
+//                    self.hide()
+//                } else {
+//                    actiontarget.setText("Invalid password.")
+//                }
             }
         }
 
