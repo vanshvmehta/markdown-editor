@@ -69,11 +69,9 @@ class UserService(databaseSvc: DatabaseService) {
                     val directoryPath = "$basePath/$username"
                     if (!File(directoryPath).isDirectory) {
                         Files.createDirectory(Paths.get(directoryPath))
+                        Files.createDirectory(Paths.get("$basePath/$username/root"))
+                        Files.createFile(Paths.get("$basePath/$username/config.txt"))
                     }
-
-                    Files.createDirectory(Paths.get("$basePath/$username"))
-                    Files.createDirectory(Paths.get("$basePath/$username/root"))
-                    Files.createFile(Paths.get("$basePath/$username/config.txt"))
                 }
             }
         } catch (ex: SQLException) {
