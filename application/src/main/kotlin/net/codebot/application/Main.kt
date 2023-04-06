@@ -16,17 +16,13 @@ import com.vladsch.flexmark.util.misc.Extension
 import javafx.application.Application
 import javafx.collections.FXCollections
 import javafx.event.EventHandler
-import javafx.geometry.Insets
-import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.input.*
 import javafx.scene.layout.BorderPane
-import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
-import javafx.scene.text.Text
 import javafx.scene.web.WebView
 import javafx.stage.FileChooser
 import javafx.stage.Stage
@@ -660,11 +656,21 @@ class Main : Application() {
 
         val scene = Scene(border)
         stage.isResizable = true
-        stage.width = 750.0
-        stage.height = 450.0
+        stage.width = userConfig.defaultWidth
+        stage.height = userConfig.defaultHeight
         stage.title = "Markdown Editor"
         stage.scene = scene
         stage.hide()
+
+        stage.widthProperty().addListener{ obs, oldValue, newValue ->
+            // stage.setWidth(newValue as Double)
+            userConfig = updateWidthConfig(userConfig, newValue as Double)
+        }
+
+        stage.heightProperty().addListener{ obs, oldValue, newValue ->
+            // stage.setHeight(newValue as Double)
+            userConfig = updateHeightConfig(userConfig, newValue as Double)
+        }
 
         // authentication box
         val loginScene = Scene(LoginManager().build(loginStage, stage))
