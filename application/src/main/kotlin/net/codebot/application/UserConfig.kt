@@ -16,17 +16,14 @@ data class UserSetting(
     var theme: String,
     var defaultFileLocation: String,
     var defaultWidth: Double,
-    var defaultHeight: Double,
-    var defaultFont: String,
-    var defaultSize: Int
+    var defaultHeight: Double
 )
 
 //Check config file -> return user setting data class
 fun initConfig(): UserSetting {
     var currSetting = UserSetting(
         "","",
-        0.0, 0.0,
-        "", 0)
+        0.0, 0.0)
 
     val configFile = File(getConfigPath())
 
@@ -48,8 +45,7 @@ fun initConfig(): UserSetting {
         //Default Config
         updateConfig(UserSetting(
             "light", "user.home",
-            750.0, 450.0,
-            "System", 12))
+            750.0, 450.0))
     }
 
     try {
@@ -100,9 +96,7 @@ public fun updateColorThemeConfig
         UserSetting(theme = newTheme,
             defaultFileLocation = userSetting.defaultFileLocation,
             defaultWidth = userSetting.defaultWidth,
-            defaultHeight = userSetting.defaultHeight,
-            defaultFont = userSetting.defaultFont,
-            defaultSize = userSetting.defaultSize)
+            defaultHeight = userSetting.defaultHeight)
     updateConfig(newUserSetting)
     return newUserSetting
 }
@@ -112,9 +106,7 @@ public fun updateFileLocationConfig
         UserSetting(theme = userSetting.theme,
             defaultFileLocation = newlocation,
             defaultWidth = userSetting.defaultWidth,
-            defaultHeight = userSetting.defaultHeight,
-            defaultFont = userSetting.defaultFont,
-            defaultSize = userSetting.defaultSize)
+            defaultHeight = userSetting.defaultHeight)
     updateConfig(newUserSetting)
     return newUserSetting
 }
@@ -125,9 +117,7 @@ public fun updateWidthConfig
         UserSetting(theme = userSetting.theme,
             defaultFileLocation = userSetting.defaultFileLocation,
             defaultWidth = newWidth,
-            defaultHeight = userSetting.defaultHeight,
-            defaultFont = userSetting.defaultFont,
-            defaultSize = userSetting.defaultSize)
+            defaultHeight = userSetting.defaultHeight)
     updateConfig(newUserSetting)
     return newUserSetting
 }
@@ -137,35 +127,7 @@ public fun updateHeightConfig
         UserSetting(theme = userSetting.theme,
             defaultFileLocation = userSetting.defaultFileLocation,
             defaultWidth = userSetting.defaultWidth,
-            defaultHeight = newHeight,
-            defaultFont = userSetting.defaultFont,
-            defaultSize = userSetting.defaultSize)
-    updateConfig(newUserSetting)
-    return newUserSetting
-}
-
-public fun updateFontConfig
-            (userSetting: UserSetting, newFont: String) : UserSetting {
-    val newUserSetting =
-        UserSetting(theme = userSetting.theme,
-            defaultFileLocation = userSetting.defaultFileLocation,
-            defaultWidth = userSetting.defaultWidth,
-            defaultHeight = userSetting.defaultHeight,
-            defaultFont = newFont,
-            defaultSize = userSetting.defaultSize)
-    updateConfig(newUserSetting)
-    return newUserSetting
-}
-
-public fun updateSizeConfig
-            (userSetting: UserSetting, newSize: Int) : UserSetting {
-    val newUserSetting =
-        UserSetting(theme = userSetting.theme,
-            defaultFileLocation = userSetting.defaultFileLocation,
-            defaultWidth = userSetting.defaultWidth,
-            defaultHeight = userSetting.defaultHeight,
-            defaultFont = userSetting.defaultFont,
-            defaultSize = newSize)
+            defaultHeight = newHeight)
     updateConfig(newUserSetting)
     return newUserSetting
 }
