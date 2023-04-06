@@ -17,7 +17,7 @@ data class DirectoryResponse(
 )
 
 fun getDirectory(user: String, path: String): DirectoryResponse  {
-    val baseURL = "http://localhost:8080/directory/content"
+    val baseURL = "http://ec2-18-218-223-84.us-east-2.compute.amazonaws.com:8080/directory/content"
     val data = URL("$baseURL?user=$user&path=$path").readText()
     val json = Json {prettyPrint = true}
     return json.decodeFromString<DirectoryResponse>(data)

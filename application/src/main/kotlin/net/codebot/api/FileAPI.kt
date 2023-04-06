@@ -1,5 +1,8 @@
 package net.codebot.api
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import java.net.URI
 import java.net.URL
 import java.net.http.HttpClient
@@ -7,13 +10,19 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
 
-val baseURL = "http://localhost:8080/file/content"
+val baseURL = "http://ec2-18-218-223-84.us-east-2.compute.amazonaws.com:8080/file/content"
 val renameURL = "http://localhost:8080/file/rename"
 
+@Serializable
+data class FileResponse(
+    var success: String,
+    var body: String
+)
 
-fun getFile(user: String, path: String): String  {
+fun getFile(user: String, path: String?): FileResponse  {
     val data = URL("$baseURL?user=$user&path=$path").readText()
-    return ""
+    val json = Json {prettyPrint = true}
+    return json.decodeFromString<FileResponse>(data)
 }
 
 fun putFile(user: String, path: String, name: String, content: String): String  {
