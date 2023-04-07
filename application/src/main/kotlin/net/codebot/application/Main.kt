@@ -489,6 +489,8 @@ class Main : Application() {
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace();
                 }
+                println("Updating File for User (if it exists!)")
+                updateFile("simon", cur_file.path2file)
             }
         }
 
@@ -501,15 +503,24 @@ class Main : Application() {
             } else {
                 savefilechooser.setInitialDirectory(File(userConfig.defaultFileLocation))
             }
-            val file = savefilechooser.showSaveDialog(Stage());
+            val file = savefilechooser.showSaveDialog(Stage())
             if (file != null) {
                 try {
                     val printWriter = PrintWriter(file);
                     printWriter.write(text.text);
                     printWriter.close();
+
+                    // "open" the file after we save as
+                    border.left = FolderView().build(text, cur_file, file.parentFile.absolutePath,true)
+                    border.left.getStyleClass().add("folder-view")
+                    cur_file.path2file = file.absolutePath
+                    userConfig = updateFileLocationConfig(userConfig, file.parentFile.absolutePath)
+
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace();
                 }
+                println("Uploading your new file!")
+                uploadFile("simon", file)
             }
         }
 
