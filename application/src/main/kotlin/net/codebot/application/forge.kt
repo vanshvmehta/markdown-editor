@@ -13,21 +13,30 @@ import com.vladsch.flexmark.profile.pegdown.PegdownOptionsAdapter
 import com.vladsch.flexmark.util.ast.Node
 import com.vladsch.flexmark.util.data.MutableDataSet
 import com.vladsch.flexmark.util.misc.Extension
+import javafx.application.Application
+import javafx.application.Platform
 import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
 import javafx.event.EventHandler
+import javafx.geometry.Insets
+import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.*
+import javafx.scene.control.Alert.AlertType
 import javafx.scene.input.*
+import javafx.scene.layout.Border
 import javafx.scene.layout.BorderPane
+import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
+import javafx.scene.text.Text
 import javafx.scene.web.WebView
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import javafx.util.converter.DoubleStringConverter
+import net.codebot.api.verifyUser
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintWriter
@@ -37,8 +46,8 @@ class Forge
 {
     private fun closeRequestOfMainTabPane(tab: Tab, tabPane: TabPane) {
         tab.setOnCloseRequest { e ->
-            alert.showAndWait()
-            if (alert.result == ButtonType.YES) {
+            tabalert.showAndWait()
+            if (tabalert.result == ButtonType.YES) {
                 tabPane.getTabs().remove(
                     tabPane
                         .getSelectionModel()
@@ -50,17 +59,21 @@ class Forge
         }
     }
 
+    val tabalert = Alert(
+        Alert.AlertType.CONFIRMATION,
+        "Are you sure you want to close this tab?", ButtonType.YES, ButtonType.NO, ButtonType.CANCEL
+    )
     val alert = Alert(
         Alert.AlertType.CONFIRMATION,
-        "Are you sure you want to delete?", ButtonType.YES, ButtonType.NO, ButtonType.CANCEL
+        "Make sure to save your work before exiting. Are you sure you want to sign out?", ButtonType.YES, ButtonType.NO, ButtonType.CANCEL
     )
-    private fun newTabButton(tabPane: TabPane, vBox: VBox ): Tab? {
+    private fun newTabButton(tabPane: TabPane, vBox: VBox, stage: Stage ): Tab? {
         val addTab = Tab("+") // You can replace the text with an icon
         addTab.isClosable = false
         tabPane.selectionModel.selectedItemProperty()
             .addListener { observable: ObservableValue<out Tab>?, oldTab: Tab?, newTab: Tab ->
                 if (newTab === addTab) {
-                    val temp = Tab("New Tab", deepcopy(false) )
+                    val temp = Tab("New Tab", deepcopy( stage, false) )
 
                     closeRequestOfMainTabPane(temp, tabPane)
                     tabPane.tabs.add(tabPane.tabs.size - 1,temp ) // Adding new tab before the "button" tab
@@ -70,12 +83,19 @@ class Forge
             }
         return addTab
     }
-    fun deepcopy(boolean: Boolean): VBox {
+    fun deepcopy(stage: Stage, boolean: Boolean): VBox {
         val border = BorderPane()
 
+
+        //Config, setting up themeColor and default file location
         var userConfig = initConfig()
+        // variables to know on startup? maybe user preferences etc.
         var cur_theme = "darkMode.css"
-        //val newToolBar = ToolBar(toolbar)
+
+        //var cur_theme = userConfig.theme
+        // stage for login window
+
+        val loginStage = Stage()
         var cur_file: FolderView.cur_File = FolderView.cur_File()
         //val newborder = BorderPane()
         val bold = Button("B")
@@ -224,6 +244,9 @@ class Forge
                 if (cur_theme == "darkMode.css"){
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
                             " font:" + combo.text + "px " + oldcompfont + "; }"
+                } else if (cur_theme == "nightBlue.css") {
+                    webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
+                            " font:" + combo.text + "px " + oldcompfont + "; }"
                 } else {
                     webView.engine.userStyleSheetLocation = "data:,body { font: " + combo.text + "px " + oldcompfont + "; }";
 
@@ -243,6 +266,9 @@ class Forge
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
                             " font:" + combo.text + "px " + newVal + "; }"
                     println("REACHED")
+                } else if (cur_theme == "nightBlue.css") {
+                    webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
+                            " font:" + combo.text + "px " + newVal + "; }"
                 } else {
                     webView.engine.userStyleSheetLocation = "data:,body { font: " + combo.text + "px " + newVal + "; }";
                     //println("reached light theme")
@@ -268,23 +294,7 @@ class Forge
         }
 
         compileMd.onAction = EventHandler {
-            //compiledat()
-
-            //Main.start(test)
-
-            val test = Stage()
-            test.isResizable = true
-            test.width = 750.0
-            test.height = 450.0
-            test.title = "Markdown Editor"
-            //test.scene = deepcopy(test)
-            test.show()
-
-            //test.scene = add(Label("test"))
-            // Platform.runLater { Application.launch(Main().javaClass)}
-            //test.show()
-            //Application.launch(Main().javaClass
-
+            compiledat()
         }
 
         bold.onAction = EventHandler {
@@ -330,6 +340,9 @@ class Forge
                 if (cur_theme == "darkMode.css") {
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
                             " font:" + x.toString() + "px " + compilefont.value + "; }"
+                } else if (cur_theme == "nightBlue.css") {
+                    webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
+                            " font:" + x.toString() + "px " + compilefont.value + "; }"
                 } else {
                     webView.engine.userStyleSheetLocation =
                         "data:,body { font: " + x.toString() + "px " + compilefont.value + "; }"
@@ -347,6 +360,9 @@ class Forge
                 combo.text = x.toString()
                 if (cur_theme == "darkMode.css") {
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
+                            " font:" + x.toString() + "px " + compilefont.value + "; }"
+                } else if (cur_theme == "nightBlue.css") {
+                    webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
                             " font:" + x.toString() + "px " + compilefont.value + "; }"
                 } else {
                     webView.engine.userStyleSheetLocation =
@@ -380,11 +396,11 @@ class Forge
 
         //topContainer.getChildren().add(mainCont);
 
-        val t1 = Tab("test", mainCont)
+        val t1 = Tab("New Tab", mainCont)
         closeRequestOfMainTabPane(t1, tabPane)
 
         tabPane.getTabs().add(t1);
-        val t2 = newTabButton(tabPane, mainCont)
+        val t2 = newTabButton(tabPane, mainCont, stage)
         if (t2 != null) {
             closeRequestOfMainTabPane(t2, tabPane)
         }
@@ -418,7 +434,11 @@ class Forge
                 webView.engine.
                 setUserStyleSheetLocation("data:,body { color:#FFFFFF; background-color: #707070;" +
                         " font:" + oldcompsize + "px " + oldcompfont + "; }")
-            } else if (cur_theme == "lightMode.css") {
+            } else if (cur_theme == "nightBlue.css") {
+                webView.engine.
+                userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
+                        " font:" + oldcompsize + "px " + oldcompfont + "; }"
+            } else  {
                 webView.engine.
                 setUserStyleSheetLocation("data:,body {font:" + oldcompsize + "px " + oldcompfont + ";}")
             }
@@ -433,11 +453,12 @@ class Forge
             val new = MenuItem("New")
             val saveAsFile = MenuItem("Save As")
             val saveFile = MenuItem("Save")
+            val signOut = MenuItem("Sign Out")
             val saveas = Menu("Save As")
             val savepdf = MenuItem(".pdf")
             saveas.items.addAll(savepdf)
             val exitApp = MenuItem("Exit")
-            file.items.addAll(openFile, new, saveFile, saveAsFile, exitApp)
+            file.items.addAll(openFile, new, saveFile, saveAsFile, signOut, exitApp)
 
             val edit = Menu("Edit")
             val undo = MenuItem("Undo")
@@ -453,7 +474,9 @@ class Forge
             val themes = Menu("Themes")
             val themesLight = MenuItem("Light Mode")
             val themesDark = MenuItem("Dark Mode")
-            themes.items.addAll(themesLight, themesDark)
+            val themesBlue = MenuItem("Night Blue")
+            val themesPurple = MenuItem("Quiet Light")
+            themes.items.addAll(themesLight, themesDark, themesBlue, themesPurple)
             view.items.add(themes)
 
             mainMenu.getMenus().addAll(file, edit, view);
@@ -499,7 +522,7 @@ class Forge
                         while (scanner.hasNextLine()) {
                             temp2.appendText(scanner.nextLine() + "\n");
                         }
-
+                        tabPane.getSelectionModel().getSelectedItem().text = selectedFile.name
                         temp.left = FolderView().build(temp2, cur_file, selectedFile.parentFile.absolutePath,true)
                         temp.left.getStyleClass().add("folder-view")
                         cur_file.path2file = selectedFile.absolutePath
@@ -524,6 +547,7 @@ class Forge
                             var temp = temp as BorderPane
                             //temp.center.lookup("TextArea")
                             var temp2 = temp.center.lookup("TextArea") as TextArea
+                            //tabPane.getSelectionModel().getSelectedItem().text = cur_file.path2file
                             printWriter.write(temp2.text);
                             printWriter.close();
                         }
@@ -554,6 +578,7 @@ class Forge
                             var temp = temp as BorderPane
                             //temp.center.lookup("TextArea")
                             var temp2 = temp.center.lookup("TextArea") as TextArea
+                            tabPane.getSelectionModel().getSelectedItem().text = file.name
                             printWriter.write(temp2.text);
                             printWriter.close();
                         }
@@ -564,11 +589,23 @@ class Forge
                 }
             }
 
-            val OPTIONS = PegdownOptionsAdapter.flexmarkOptions(
-                Extensions.ALL and (Extensions.ANCHORLINKS or Extensions.EXTANCHORLINKS_WRAP).inv(), TocExtension.create()
-            ).toMutable()
-                .set(TocExtension.LIST_CLASS, PdfConverterExtension.DEFAULT_TOC_LIST_CLASS)
-                .toImmutable()
+        signOut.onAction = EventHandler {
+
+            alert.showAndWait()
+            if (alert.result == ButtonType.YES) {
+                stage.hide()
+                stage.scene = Scene(Forge().deepcopy(stage,true))
+                //loginStage.show()
+               // loginStage.scene = Scene(LoginManager().build(loginStage, stage))
+            }
+
+            // reset stage as well
+        }
+        val OPTIONS = PegdownOptionsAdapter.flexmarkOptions(
+            Extensions.ALL and (Extensions.ANCHORLINKS or Extensions.EXTANCHORLINKS_WRAP).inv(), TocExtension.create()
+        ).toMutable()
+            .set(TocExtension.LIST_CLASS, PdfConverterExtension.DEFAULT_TOC_LIST_CLASS)
+            .toImmutable()
 
             savepdf.onAction = EventHandler {
                 var savefilechooser = FileChooser()
@@ -656,30 +693,41 @@ class Forge
                 text.replaceSelection(clipboard.string)
             }
 
-            // Themes function
-            themesLight.onAction = EventHandler {
-                cur_theme = "lightMode.css"
-                if(winchoice.value == "Edit Window"){
-                    oldeditsize = combo.text
-                    oldeditfont = compilefont.value
-                }else{
-                    oldcompsize = combo.text
-                    oldcompfont = compilefont.value
-                }
-                setThemes()
+        // themes helper to save font size on switch
+        fun themes_font_helper() {
+            if (winchoice.value == "Edit Window") {
+                oldeditsize = combo.text
+                oldeditfont = compilefont.value
+            } else {
+                oldcompsize = combo.text
+                oldcompfont = compilefont.value
             }
+        }
 
-            themesDark.onAction = EventHandler {
-                cur_theme = "darkMode.css"
-                if(winchoice.value == "Edit Window"){
-                    oldeditsize = combo.text
-                    oldeditfont = compilefont.value
-                }else{
-                    oldcompsize = combo.text
-                    oldcompfont = compilefont.value
-                }
-                setThemes()
-            }
+        // Themes function
+        themesLight.onAction = EventHandler {
+            cur_theme = "lightMode.css"
+            themes_font_helper()
+            setThemes()
+        }
+
+        themesDark.onAction = EventHandler {
+            cur_theme = "darkMode.css"
+            themes_font_helper()
+            setThemes()
+        }
+
+        themesBlue.onAction = EventHandler {
+            cur_theme = "nightBlue.css"
+            themes_font_helper()
+            setThemes()
+        }
+
+        themesPurple.onAction = EventHandler {
+            cur_theme = "quietLight.css"
+            themes_font_helper()
+            setThemes()
+        }
 
 
 
@@ -734,6 +782,11 @@ class Forge
         setThemes()
 
         if(boolean){
+            val loginScene = Scene(LoginManager().build(loginStage, stage))
+            loginStage.scene = loginScene
+            loginStage.title = "User Login"
+            loginStage.show()
+
 
             return topContainer
         }
