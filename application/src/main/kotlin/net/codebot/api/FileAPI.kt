@@ -10,7 +10,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
 
-val baseURL = "http://ec2-18-218-223-84.us-east-2.compute.amazonaws.com:8080/file/content"
+val baseURL = "http://ec2-18-118-140-38.us-east-2.compute.amazonaws.com:8080/file/content"
 val renameURL = "http://localhost:8080/file/rename"
 
 @Serializable
@@ -26,13 +26,19 @@ fun getFile(user: String, path: String?): FileResponse  {
 }
 
 fun putFile(user: String, path: String, name: String, content: String): String  {
-    val client = HttpClient.newBuilder().build();
-    val request = HttpRequest.newBuilder()
-        .uri(URI.create("$baseURL?user=$user&path=$path&name=$name"))
-        .PUT(HttpRequest.BodyPublishers.ofString(content))
-        .build()
-    val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-    return response.body()
+    try {
+        val client = HttpClient.newBuilder().build();
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("$baseURL?user=$user&path=$path&name=$name"))
+            .PUT(HttpRequest.BodyPublishers.ofString(content))
+            .build()
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+        val json = Json { prettyPrint = true }
+        return json.decodeFromString<FileResponse>(response.body()).success
+    } catch (e: Exception) {
+        println("File exists")
+    }
+    return "false"
 }
 
 fun postFile(user: String, path: String, content: String): String  {
