@@ -18,15 +18,20 @@ import javafx.application.Platform
 import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
 import javafx.event.EventHandler
+import javafx.geometry.Insets
+import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.control.Alert.AlertType
 import javafx.scene.input.*
 import javafx.scene.layout.Border
 import javafx.scene.layout.BorderPane
+import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
+import javafx.scene.layout.Priority
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
+import javafx.scene.text.Text
 import javafx.scene.web.WebView
 import javafx.stage.FileChooser
 import javafx.stage.Stage
@@ -36,71 +41,63 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintWriter
 import java.util.*
-import net.codebot.application.Forge
 
-val alert = Alert(
-    AlertType.CONFIRMATION,
-    "Are you sure you want to delete?", ButtonType.YES, ButtonType.NO, ButtonType.CANCEL
-)
-private fun newTabButton(tabPane: TabPane, vBox: VBox ): Tab? {
-    val addTab = Tab("+") // You can replace the text with an icon
-    addTab.isClosable = false
-    tabPane.selectionModel.selectedItemProperty()
-        .addListener { observable: ObservableValue<out Tab>?, oldTab: Tab?, newTab: Tab ->
-            if (newTab === addTab) {
-                val temp = Tab("New Tab", vBox )
-                closeRequestOfMainTabPane(temp, tabPane)
-                tabPane.tabs.add(tabPane.tabs.size - 1,temp ) // Adding new tab before the "button" tab
-                tabPane.selectionModel
-                    .select(tabPane.tabs.size - 2) // Selecting the tab before the button, which is the newly created one
+class Forge
+{
+    private fun closeRequestOfMainTabPane(tab: Tab, tabPane: TabPane) {
+        tab.setOnCloseRequest { e ->
+            tabalert.showAndWait()
+            if (tabalert.result == ButtonType.YES) {
+                tabPane.getTabs().remove(
+                    tabPane
+                        .getSelectionModel()
+                        .getSelectedItem()
+                )
+            } else {
+                e.consume()
             }
         }
-    return addTab
-}
-private fun closeRequestOfMainTabPane(tab: Tab, tabPane: TabPane) {
-    tab.setOnCloseRequest { e ->
-        alert.showAndWait()
-        if (alert.result == ButtonType.YES) {
-            tabPane.getTabs().remove(
-                tabPane
-                    .getSelectionModel()
-                    .getSelectedItem()
-            )
-        } else {
-            e.consume()
-        }
     }
-}
 
+    val tabalert = Alert(
+        Alert.AlertType.CONFIRMATION,
+        "Are you sure you want to close this tab?", ButtonType.YES, ButtonType.NO, ButtonType.CANCEL
+    )
+    val alert = Alert(
+        Alert.AlertType.CONFIRMATION,
+        "Make sure to save your work before exiting. Are you sure you want to sign out?", ButtonType.YES, ButtonType.NO, ButtonType.CANCEL
+    )
+    private fun newTabButton(tabPane: TabPane, vBox: VBox, stage: Stage ): Tab? {
+        val addTab = Tab("+") // You can replace the text with an icon
+        addTab.isClosable = false
+        tabPane.selectionModel.selectedItemProperty()
+            .addListener { observable: ObservableValue<out Tab>?, oldTab: Tab?, newTab: Tab ->
+                if (newTab === addTab) {
+                    val temp = Tab("New Tab", deepcopy( stage, false) )
 
-class Main : Application() {
-    override fun start(stage: Stage) {
-
-
-        stage.isResizable = true
-        stage.width = 750.0
-        stage.height = 450.0
-        stage.title = "Markdown Editor"
-        stage.scene = Scene(Forge().deepcopy(stage,true))
-
-       // stage.show()
-
+                    closeRequestOfMainTabPane(temp, tabPane)
+                    tabPane.tabs.add(tabPane.tabs.size - 1,temp ) // Adding new tab before the "button" tab
+                    tabPane.selectionModel
+                        .select(tabPane.tabs.size - 2) // Selecting the tab before the button, which is the newly created one
+                }
+            }
+        return addTab
     }
-/*
+    fun deepcopy(stage: Stage, boolean: Boolean): VBox {
+        val border = BorderPane()
 
 
         //Config, setting up themeColor and default file location
         var userConfig = initConfig()
         // variables to know on startup? maybe user preferences etc.
-        //var cur_theme = "darkMode.css"
+        var cur_theme = "darkMode.css"
 
-        val border = BorderPane()
-
-        var cur_theme = userConfig.theme
+        //var cur_theme = userConfig.theme
         // stage for login window
-        val loginStage = Stage()
 
+        val loginStage = Stage()
         var cur_file: FolderView.cur_File = FolderView.cur_File()
+        //val newborder = BorderPane()
         val bold = Button("B")
         val italics = Button("I")
         val heading = Button("H")
@@ -108,17 +105,19 @@ class Main : Application() {
         val compileMd = Button("Compile")
         val plus = Button("+")
         val minus = Button("-")
-
+        val combo = TextField()
         val options = MutableDataSet().set(
-            Parser.EXTENSIONS, listOf(TablesExtension.create(),
+            Parser.EXTENSIONS, listOf(
+                TablesExtension.create(),
                 StrikethroughExtension.create(),
                 GitLabExtension.create(),
                 EmojiExtension.create()) as Collection<Extension>
         ).toImmutable()
         val parser: Parser = Parser.builder(options).build()
         val renderer = HtmlRenderer.builder(options).build()
-
-
+        combo.setTextFormatter(TextFormatter(DoubleStringConverter()))
+        combo.text = "12.0"
+        var htmlstr = ""
         val windows = listOf("Edit Window","Compile Window")
         val winchoice = ComboBox(
             FXCollections.observableList(windows)
@@ -126,32 +125,17 @@ class Main : Application() {
         winchoice.selectionModel.select("Edit Window")
         winchoice.minWidth = 120.0
         winchoice.maxWidth = 120.0
-
-            //val combo_box = ComboBox(sizes)
-        val combo = TextField()
-
-        combo.setTextFormatter(TextFormatter(DoubleStringConverter()))
-        combo.text = "12.0"
-        var htmlstr = ""
-
         var oldeditfont = Font.getDefault().family
         var oldeditsize = "12.0"
         var oldcompfont = Font.getDefault().family
         var oldcompsize = "15.0"
-
-
         combo.minWidth = 60.0
         combo.maxWidth = 60.0
-
-
         val compilefont = ComboBox<String>()
-
         compilefont.setValue(oldcompfont)
         compilefont.items.setAll(Font.getFamilies())
-
         compilefont.minWidth = 100.0
         compilefont.maxWidth = 100.0
-
 
         val toolbar = ToolBar(
 
@@ -190,8 +174,6 @@ class Main : Application() {
         // code for status bar (bottom pane)
         val label = Label("Start Typing to Get Statistics!")
         val status = HBox(label)
-
-        // code for left pane
         val tree = FolderView().build(text, cur_file)
 
 
@@ -240,8 +222,8 @@ class Main : Application() {
             webView.engine.loadContent(html);
         }
         webView.engine.userStyleSheetLocation =
-        "data:,body { color:#FFFFFF; background-color: #707070;" +
-                " font:" + oldcompsize + "px " + oldcompfont + "; }"
+            "data:,body { color:#FFFFFF; background-color: #707070;" +
+                    " font:" + oldcompsize + "px " + oldcompfont + "; }"
         compiledat()
         ///compilesize.valueProperty().addListener { _, _, newVal ->
         //    webView.engine.userStyleSheetLocation = "data:,body { font: " + newVal +"px " + compilefont.value + "; }";
@@ -253,13 +235,13 @@ class Main : Application() {
                 oldcompfont = compilefont.value
                 combo.text = text.font.size.toString()
                 compilefont.setValue(oldeditfont)
-            }else {
+            }else{
                 oldeditsize = combo.text
                 oldeditfont = compilefont.value
                 combo.text = oldcompsize
                 compilefont.setValue(oldcompfont)
 
-                if (cur_theme == "darkMode.css") {
+                if (cur_theme == "darkMode.css"){
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
                             " font:" + combo.text + "px " + oldcompfont + "; }"
                 } else if (cur_theme == "nightBlue.css") {
@@ -267,11 +249,12 @@ class Main : Application() {
                             " font:" + combo.text + "px " + oldcompfont + "; }"
                 } else {
                     webView.engine.userStyleSheetLocation = "data:,body { font: " + combo.text + "px " + oldcompfont + "; }";
-                    println("reached light theme")
+
                 }
             }
 
         }
+
 
         compilefont.valueProperty().addListener { _, _, newVal ->
             if(winchoice.value == "Edit Window"){
@@ -288,7 +271,7 @@ class Main : Application() {
                             " font:" + combo.text + "px " + newVal + "; }"
                 } else {
                     webView.engine.userStyleSheetLocation = "data:,body { font: " + combo.text + "px " + newVal + "; }";
-                    println("reached light theme")
+                    //println("reached light theme")
                 }
             }
         }
@@ -360,7 +343,7 @@ class Main : Application() {
                 } else if (cur_theme == "nightBlue.css") {
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
                             " font:" + x.toString() + "px " + compilefont.value + "; }"
-                }else {
+                } else {
                     webView.engine.userStyleSheetLocation =
                         "data:,body { font: " + x.toString() + "px " + compilefont.value + "; }"
                 }
@@ -397,58 +380,40 @@ class Main : Application() {
         compileMd.setTooltip( Tooltip("Compile Markdown - Meta+R"))
 
 
-
         val topContainer = VBox()
         val mainMenu = MenuBar()
         val tabPane = TabPane()
 
 
-        val file = Menu("File")
-        val openFile = MenuItem("Open File")
-        val new = MenuItem("New")
-        val saveAsFile = MenuItem("Save As")
-        val saveFile = MenuItem("Save")
-        val signOut = MenuItem("Sign Out")
-        val saveas = Menu("Save As")
-        val savepdf = MenuItem(".pdf")
-        saveas.items.addAll(savepdf)
-        val exitApp = MenuItem("Exit")
-        file.items.addAll(openFile, new, saveFile, saveAsFile, signOut,exitApp)
 
-        val edit = Menu("Edit")
-        val undo = MenuItem("Undo")
-        val redo = MenuItem("Redo")
-        val cut = MenuItem("Cut")
-        val copy = MenuItem("Copy")
-        val paste = MenuItem("Paste")
-        edit.items.addAll(undo, redo, cut, copy, paste)
 
-        //Create SubMenu Help.
-        //Create SubMenu Help.
-        val view = Menu("View")
-        val themes = Menu("Themes")
-        val themesLight = MenuItem("Light Mode")
-        val themesDark = MenuItem("Dark Mode")
-        val themesBlue = MenuItem("Night Blue")
-        val themesPurple = MenuItem("Quiet Light")
-        themes.items.addAll(themesLight, themesDark, themesBlue, themesPurple)
-        view.items.add(themes)
-
-        mainMenu.getMenus().addAll(file, edit, view);
-
-        topContainer.getChildren().add(mainMenu);
         val mainCont = VBox()
-        topContainer.getChildren().add(toolbar);
+        //topContainer.getChildren().add(toolbar);
+        VBox.setVgrow(toolbar, Priority.ALWAYS)
+        mainCont.getChildren().add(toolbar);
+        VBox.setVgrow(border, Priority.ALWAYS)
+        mainCont.getChildren().add(border);
 
-        // stylesheets for themes
+        //topContainer.getChildren().add(mainCont);
+
+        val t1 = Tab("New Tab", mainCont)
+        closeRequestOfMainTabPane(t1, tabPane)
+
+        tabPane.getTabs().add(t1);
+        val t2 = newTabButton(tabPane, mainCont, stage)
+        if (t2 != null) {
+            closeRequestOfMainTabPane(t2, tabPane)
+        }
+
+
+        tabPane.getTabs().add(t2);
+
         fun setThemes() {
             // clear and attach new theme
             //border.getStylesheets().clear()
-           // border.getStylesheets().add(cur_theme)
-            border.getStylesheets().clear()
-            border.getStylesheets().add(cur_theme)
-            userConfig = updateColorThemeConfig(userConfig, cur_theme)
-
+            // border.getStylesheets().add(cur_theme)
+            topContainer.getStylesheets().clear()
+            topContainer.getStylesheets().add(cur_theme)
             // menu bars
             mainMenu.getStyleClass().add("menu-bar")
             mainMenu.getStyleClass().add("menu")
@@ -473,110 +438,167 @@ class Main : Application() {
                 webView.engine.
                 userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
                         " font:" + oldcompsize + "px " + oldcompfont + "; }"
-            } else {
+            } else  {
                 webView.engine.
                 setUserStyleSheetLocation("data:,body {font:" + oldcompsize + "px " + oldcompfont + ";}")
             }
         }
 
-        // Shortcuts for Menu Items
-        openFile.accelerator = KeyCombination.keyCombination("Ctrl+O")
-        new.accelerator = KeyCombination.keyCombination("Ctrl+N")
-        saveFile.accelerator = KeyCombination.keyCombination("Ctrl+S")
-        saveAsFile.accelerator = KeyCombination.keyCombination("Ctrl+Shift+S")
-        undo.accelerator = KeyCombination.keyCombination("Ctrl+Z")
-        redo.accelerator = KeyCombination.keyCombination("Ctrl+Y")
-        cut.accelerator = KeyCombination.keyCombination("Ctrl+X")
-        copy.accelerator = KeyCombination.keyCombination("Ctrl+C")
-        paste.accelerator = KeyCombination.keyCombination("Ctrl+V")
 
-        // Shortcuts for Buttons
-        val bold_combo: KeyCombination = KeyCodeCombination(KeyCode.B,
-            KeyCombination.CONTROL_DOWN, KeyCodeCombination.SHIFT_DOWN)
-        val italic_combo: KeyCombination = KeyCodeCombination(KeyCode.I,
-            KeyCombination.CONTROL_DOWN, KeyCodeCombination.SHIFT_DOWN)
-        val heading_combo: KeyCombination = KeyCodeCombination(KeyCode.H,
-            KeyCombination.CONTROL_DOWN, KeyCodeCombination.SHIFT_DOWN)
-        val strikethrough_combo: KeyCombination = KeyCodeCombination(KeyCode.DIGIT5,
-            KeyCombination.CONTROL_DOWN)
-        val compile_combo: KeyCombination = KeyCodeCombination(KeyCode.R,
-            KeyCombination.CONTROL_DOWN)
 
-        border.setOnKeyPressed {
-                when (true) {
-                    bold_combo.match(it) -> strikethrough.fire()
-                    italic_combo.match(it) -> italics.fire()
-                    heading_combo.match(it) -> heading.fire()
-                    strikethrough_combo.match(it) -> strikethrough.fire()
-                    compile_combo.match(it) -> compileMd.fire()
+        if(boolean) {
+           ;
+            val file = Menu("File")
+            val openFile = MenuItem("Open File")
+            val new = MenuItem("New")
+            val saveAsFile = MenuItem("Save As")
+            val saveFile = MenuItem("Save")
+            val signOut = MenuItem("Sign Out")
+            val saveas = Menu("Save As")
+            val savepdf = MenuItem(".pdf")
+            saveas.items.addAll(savepdf)
+            val exitApp = MenuItem("Exit")
+            file.items.addAll(openFile, new, saveFile, saveAsFile, signOut, exitApp)
+
+            val edit = Menu("Edit")
+            val undo = MenuItem("Undo")
+            val redo = MenuItem("Redo")
+            val cut = MenuItem("Cut")
+            val copy = MenuItem("Copy")
+            val paste = MenuItem("Paste")
+            edit.items.addAll(undo, redo, cut, copy, paste)
+
+            //Create SubMenu Help.
+            //Create SubMenu Help.
+            val view = Menu("View")
+            val themes = Menu("Themes")
+            val themesLight = MenuItem("Light Mode")
+            val themesDark = MenuItem("Dark Mode")
+            val themesBlue = MenuItem("Night Blue")
+            val themesPurple = MenuItem("Quiet Light")
+            themes.items.addAll(themesLight, themesDark, themesBlue, themesPurple)
+            view.items.add(themes)
+
+            mainMenu.getMenus().addAll(file, edit, view);
+            topContainer.getChildren().add(mainMenu);
+            VBox.setVgrow(tabPane, Priority.ALWAYS)
+            topContainer.getChildren().add(tabPane)
+
+            openFile.accelerator = KeyCombination.keyCombination("Ctrl+O")
+            new.accelerator = KeyCombination.keyCombination("Ctrl+N")
+            saveFile.accelerator = KeyCombination.keyCombination("Ctrl+S")
+            saveAsFile.accelerator = KeyCombination.keyCombination("Ctrl+Shift+S")
+            undo.accelerator = KeyCombination.keyCombination("Ctrl+Z")
+            redo.accelerator = KeyCombination.keyCombination("Ctrl+Y")
+            cut.accelerator = KeyCombination.keyCombination("Ctrl+X")
+            copy.accelerator = KeyCombination.keyCombination("Ctrl+C")
+            paste.accelerator = KeyCombination.keyCombination("Ctrl+V")
+
+
+
+            //OpenFile function
+            openFile.onAction = EventHandler {
+                val filechooser = FileChooser();
+                filechooser.setTitle("Open my file")
+
+                if (userConfig.defaultFileLocation == "user.home") {
+                    filechooser.setInitialDirectory(File(System.getProperty(userConfig.defaultFileLocation)))
+                } else {
+                    filechooser.setInitialDirectory(File(userConfig.defaultFileLocation))
                 }
-        }
 
-        //OpenFile function
-        openFile.onAction = EventHandler {
-            val filechooser = FileChooser();
-            filechooser.setTitle("Open my file")
-
-            if (userConfig.defaultFileLocation == "user.home") {
-                filechooser.setInitialDirectory(File(System.getProperty(userConfig.defaultFileLocation)))
-            } else {
-                filechooser.setInitialDirectory(File(userConfig.defaultFileLocation))
-            }
-
-            val selectedFile = filechooser.showOpenDialog(stage)
-            try {
-                val scanner = Scanner(selectedFile);
-                text.clear()
-                while (scanner.hasNextLine()) {
-                    text.appendText(scanner.nextLine() + "\n");
-                }
-            } catch (e: FileNotFoundException) {
-                e.printStackTrace();
-            }
-            border.left = FolderView().build(text, cur_file, selectedFile.parentFile.absolutePath,true)
-            border.left.getStyleClass().add("folder-view")
-            cur_file.path2file = selectedFile.absolutePath
-            userConfig = updateFileLocationConfig(userConfig, selectedFile.parentFile.absolutePath)
-        }
-
-        //SaveFile Function
-        saveFile.onAction = EventHandler {
-            if (cur_file.path2file != null) {
+                val selectedFile = filechooser.showOpenDialog(Stage())
                 try {
-                    val printWriter = PrintWriter(cur_file.path2file)
-                    printWriter.write(text.text);
-                    printWriter.close();
+                    val scanner = Scanner(selectedFile);
+                    val temp = tabPane.getSelectionModel().getSelectedItem().
+                    content.lookup("BorderPane")
+
+                    if (temp != null){
+                        var temp = temp as BorderPane
+                        //temp.center.lookup("TextArea")
+                        var temp2 = temp.center.lookup("TextArea") as TextArea
+                        temp2.clear()
+                        //text.clear()
+                        while (scanner.hasNextLine()) {
+                            temp2.appendText(scanner.nextLine() + "\n");
+                        }
+                        tabPane.getSelectionModel().getSelectedItem().text = selectedFile.name
+                        temp.left = FolderView().build(temp2, cur_file, selectedFile.parentFile.absolutePath,true)
+                        temp.left.getStyleClass().add("folder-view")
+                        cur_file.path2file = selectedFile.absolutePath
+                        userConfig = updateFileLocationConfig(userConfig, selectedFile.parentFile.absolutePath)
+                    }
+
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace();
                 }
-            }
-        }
 
-        //SaveAsFile function
-        saveAsFile.onAction = EventHandler {
-            val savefilechooser = FileChooser()
-
-            if (userConfig.defaultFileLocation == "user.home") {
-                savefilechooser.setInitialDirectory(File(System.getProperty(userConfig.defaultFileLocation)))
-            } else {
-                savefilechooser.setInitialDirectory(File(userConfig.defaultFileLocation))
             }
-            val file = savefilechooser.showSaveDialog(Stage());
-            if (file != null) {
-                try {
-                    val printWriter = PrintWriter(file);
-                    printWriter.write(text.text);
-                    printWriter.close();
-                } catch (e: FileNotFoundException) {
-                    e.printStackTrace();
+
+            //SaveFile Function
+            saveFile.onAction = EventHandler {
+                if (cur_file.path2file != null) {
+                    try {
+                        val printWriter = PrintWriter(cur_file.path2file)
+                        val temp = tabPane.getSelectionModel().getSelectedItem().
+                        content.lookup("BorderPane")
+
+                        if (temp != null){
+                            var temp = temp as BorderPane
+                            //temp.center.lookup("TextArea")
+                            var temp2 = temp.center.lookup("TextArea") as TextArea
+                            //tabPane.getSelectionModel().getSelectedItem().text = cur_file.path2file
+                            printWriter.write(temp2.text);
+                            printWriter.close();
+                        }
+
+                    } catch (e: FileNotFoundException) {
+                        e.printStackTrace();
+                    }
                 }
             }
-        }
+
+            //SaveAsFile function
+            saveAsFile.onAction = EventHandler {
+                val savefilechooser = FileChooser()
+
+                if (userConfig.defaultFileLocation == "user.home") {
+                    savefilechooser.setInitialDirectory(File(System.getProperty(userConfig.defaultFileLocation)))
+                } else {
+                    savefilechooser.setInitialDirectory(File(userConfig.defaultFileLocation))
+                }
+                val file = savefilechooser.showSaveDialog(Stage());
+                if (file != null) {
+                    try {
+                        val printWriter = PrintWriter(file);
+                        val temp = tabPane.getSelectionModel().getSelectedItem().
+                        content.lookup("BorderPane")
+
+                        if (temp != null){
+                            var temp = temp as BorderPane
+                            //temp.center.lookup("TextArea")
+                            var temp2 = temp.center.lookup("TextArea") as TextArea
+                            tabPane.getSelectionModel().getSelectedItem().text = file.name
+                            printWriter.write(temp2.text);
+                            printWriter.close();
+                        }
+
+                    } catch (e: FileNotFoundException) {
+                        e.printStackTrace();
+                    }
+                }
+            }
 
         signOut.onAction = EventHandler {
-            stage.hide()
-            loginStage.show()
-            loginStage.scene = Scene(LoginManager().build(loginStage, stage))
+
+            alert.showAndWait()
+            if (alert.result == ButtonType.YES) {
+                stage.hide()
+                stage.scene = Scene(Forge().deepcopy(stage,true))
+                //loginStage.show()
+               // loginStage.scene = Scene(LoginManager().build(loginStage, stage))
+            }
+
             // reset stage as well
         }
         val OPTIONS = PegdownOptionsAdapter.flexmarkOptions(
@@ -585,91 +607,91 @@ class Main : Application() {
             .set(TocExtension.LIST_CLASS, PdfConverterExtension.DEFAULT_TOC_LIST_CLASS)
             .toImmutable()
 
-        savepdf.onAction = EventHandler {
-            var savefilechooser = FileChooser()
-            if (userConfig.defaultFileLocation == "user.home") {
-                savefilechooser.setInitialDirectory(File(System.getProperty(userConfig.defaultFileLocation)))
-            } else {
-                savefilechooser.setInitialDirectory(File(userConfig.defaultFileLocation))
+            savepdf.onAction = EventHandler {
+                var savefilechooser = FileChooser()
+                if (userConfig.defaultFileLocation == "user.home") {
+                    savefilechooser.setInitialDirectory(File(System.getProperty(userConfig.defaultFileLocation)))
+                } else {
+                    savefilechooser.setInitialDirectory(File(userConfig.defaultFileLocation))
+                }
+                val strfile = savefilechooser.initialDirectory.toString()
+                //val html = webView.engine.executeScript("document.documentElement.outerHTML")//.toString()
+                PdfConverterExtension.exportToPdf(strfile + "/test.pdf", htmlstr, "", OPTIONS)
+
             }
-            val strfile = savefilechooser.initialDirectory.toString()
-            //val html = webView.engine.executeScript("document.documentElement.outerHTML")//.toString()
-            PdfConverterExtension.exportToPdf(strfile + "/test.pdf", htmlstr, "", OPTIONS)
 
-        }
+            // Undo, Redo
+            undo.isDisable = true
+            redo.isDisable = true
 
-        // Undo, Redo
-        undo.isDisable = true
-        redo.isDisable = true
+            // check if Undo and Redo should be enabled
+            text.undoableProperty().addListener {obs, cannotUndo, canUndo ->
+                undo.isDisable = !text.isUndoable
+            }
 
-        // check if Undo and Redo should be enabled
-        text.undoableProperty().addListener {obs, cannotUndo, canUndo ->
-            undo.isDisable = !text.isUndoable
-        }
+            text.redoableProperty().addListener {obs, cannotRedo, canRedo ->
+                redo.isDisable = !text.isRedoable
+            }
 
-        text.redoableProperty().addListener {obs, cannotRedo, canRedo ->
-            redo.isDisable = !text.isRedoable
-        }
+            undo.onAction = EventHandler {
+                text.undo()
+            }
 
-        undo.onAction = EventHandler {
-            text.undo()
-        }
+            redo.onAction = EventHandler {
+                text.redo()
+            }
 
-        redo.onAction = EventHandler {
-            text.redo()
-        }
-
-        // Cut, Copy, Paste
-        var clipboard: Clipboard = Clipboard.getSystemClipboard()
-        var content = ClipboardContent()
-        cut.isDisable = true
-        copy.isDisable = true
-        paste.isDisable = true
-
-        // check if Cut, Copy, Paste should be enabled
-        edit.showingProperty().addListener { obs, notShown, isShown ->
+            // Cut, Copy, Paste
+            var clipboard: Clipboard = Clipboard.getSystemClipboard()
+            var content = ClipboardContent()
             cut.isDisable = true
             copy.isDisable = true
             paste.isDisable = true
 
-            if (text.isFocused) {
-                if (text.selectedText != "") {
-                    cut.isDisable = false
-                    copy.isDisable = false
+            // check if Cut, Copy, Paste should be enabled
+            edit.showingProperty().addListener { obs, notShown, isShown ->
+                cut.isDisable = true
+                copy.isDisable = true
+                paste.isDisable = true
+
+                if (text.isFocused) {
+                    if (text.selectedText != "") {
+                        cut.isDisable = false
+                        copy.isDisable = false
+                    }
+                    paste.isDisable = !clipboard.hasString()
                 }
-                paste.isDisable = !clipboard.hasString()
-            }
-            else if (webView.isFocused) {
-                if (webView.getEngine().executeScript("window.getSelection().toString()")
-                            as String? != "") {
-                    copy.isDisable = false
+                else if (webView.isFocused) {
+                    if (webView.getEngine().executeScript("window.getSelection().toString()")
+                                as String? != "") {
+                        copy.isDisable = false
+                    }
                 }
             }
-        }
 
-        cut.onAction = EventHandler {
-            var currentHighlight = text.selectedText
-            text.replaceSelection("")
-            content.putString(currentHighlight)
-            clipboard.setContent(content)
-        }
-
-        copy.onAction = EventHandler {
-            var currentHighlight: String? = ""
-            if (webView.isFocused) {
-                currentHighlight = webView.getEngine().
-                executeScript("window.getSelection().toString()") as String?
+            cut.onAction = EventHandler {
+                var currentHighlight = text.selectedText
+                text.replaceSelection("")
+                content.putString(currentHighlight)
+                clipboard.setContent(content)
             }
-            else {
-                currentHighlight = text.selectedText
-            }
-            content.putString(currentHighlight)
-            clipboard.setContent(content)
-        }
 
-        paste.onAction = EventHandler {
-            text.replaceSelection(clipboard.string)
-        }
+            copy.onAction = EventHandler {
+                var currentHighlight: String? = ""
+                if (webView.isFocused) {
+                    currentHighlight = webView.getEngine().
+                    executeScript("window.getSelection().toString()") as String?
+                }
+                else {
+                    currentHighlight = text.selectedText
+                }
+                content.putString(currentHighlight)
+                clipboard.setContent(content)
+            }
+
+            paste.onAction = EventHandler {
+                text.replaceSelection(clipboard.string)
+            }
 
         // themes helper to save font size on switch
         fun themes_font_helper() {
@@ -707,36 +729,70 @@ class Main : Application() {
             setThemes()
         }
 
-        border.top = topContainer
+
+
+
+            //return topContainer
+        }
+
+
+
+
+        // Shortcuts for Menu Items
+
+
+        // Shortcuts for Buttons
+        val bold_combo: KeyCombination = KeyCodeCombination(
+            KeyCode.B,
+            KeyCombination.CONTROL_DOWN, KeyCodeCombination.SHIFT_DOWN)
+        val italic_combo: KeyCombination = KeyCodeCombination(
+            KeyCode.I,
+            KeyCombination.CONTROL_DOWN, KeyCodeCombination.SHIFT_DOWN)
+        val heading_combo: KeyCombination = KeyCodeCombination(
+            KeyCode.H,
+            KeyCombination.CONTROL_DOWN, KeyCodeCombination.SHIFT_DOWN)
+        val strikethrough_combo: KeyCombination = KeyCodeCombination(
+            KeyCode.DIGIT5,
+            KeyCombination.CONTROL_DOWN)
+        val compile_combo: KeyCombination = KeyCodeCombination(
+            KeyCode.R,
+            KeyCombination.CONTROL_DOWN)
+
+        border.setOnKeyPressed {
+            when (true) {
+                bold_combo.match(it) -> strikethrough.fire()
+                italic_combo.match(it) -> italics.fire()
+                heading_combo.match(it) -> heading.fire()
+                strikethrough_combo.match(it) -> strikethrough.fire()
+                compile_combo.match(it) -> compileMd.fire()
+            }
+        }
+
+
+
+
+
+
+
+        //border.top = topContainer
         border.center = center
         border.bottom = status
         border.left = left
         border.right = right
-
         setThemes()
 
-        val scene = Scene(border)
-        stage.isResizable = true
-        stage.width = userConfig.defaultWidth
-        stage.height = userConfig.defaultHeight
-        stage.title = "Markdown Editor"
-        stage.scene = scene
-        stage.hide()
+        if(boolean){
+            val loginScene = Scene(LoginManager().build(loginStage, stage))
+            loginStage.scene = loginScene
+            loginStage.title = "User Login"
+            loginStage.show()
 
-        stage.widthProperty().addListener{ obs, oldValue, newValue ->
-            // stage.setWidth(newValue as Double)
-            userConfig = updateWidthConfig(userConfig, newValue as Double)
+
+            return topContainer
         }
+        return mainCont
 
-        stage.heightProperty().addListener{ obs, oldValue, newValue ->
-            // stage.setHeight(newValue as Double)
-            userConfig = updateHeightConfig(userConfig, newValue as Double)
-        }
 
-        // authentication box
-        val loginScene = Scene(LoginManager().build(loginStage, stage))
-        loginStage.scene = loginScene
-        loginStage.title = "User Login"
-        loginStage.show()
-    }*/
+
+    }
 }
