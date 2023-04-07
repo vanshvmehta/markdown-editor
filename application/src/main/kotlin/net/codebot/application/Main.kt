@@ -16,17 +16,22 @@ import com.vladsch.flexmark.util.misc.Extension
 import javafx.application.Application
 import javafx.collections.FXCollections
 import javafx.event.EventHandler
+import javafx.geometry.Insets
+import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.input.*
 import javafx.scene.layout.BorderPane
+import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
+import javafx.scene.text.Text
 import javafx.scene.web.WebView
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import javafx.util.converter.DoubleStringConverter
+import net.codebot.api.verifyUser
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintWriter
@@ -35,12 +40,14 @@ import java.util.*
 
 class Main : Application() {
     override fun start(stage: Stage) {
+        println(verifyUser("dan", "oldPwd"))
 
         //Config, setting up themeColor and default file location
         var userConfig = initConfig()
         // variables to know on startup? maybe user preferences etc.
-        var cur_theme = "darkMode.css"
-
+        var cur_theme = userConfig.theme
+        // stage for login window
+        val loginStage = Stage()
 
         var cur_file: FolderView.cur_File = FolderView.cur_File()
         val bold = Button("B")
@@ -195,14 +202,17 @@ class Main : Application() {
                 oldcompfont = compilefont.value
                 combo.text = text.font.size.toString()
                 compilefont.setValue(oldeditfont)
-            }else{
+            }else {
                 oldeditsize = combo.text
                 oldeditfont = compilefont.value
                 combo.text = oldcompsize
                 compilefont.setValue(oldcompfont)
 
-                if (cur_theme == "darkMode.css"){
+                if (cur_theme == "darkMode.css") {
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
+                            " font:" + combo.text + "px " + oldcompfont + "; }"
+                } else if (cur_theme == "nightBlue.css") {
+                    webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
                             " font:" + combo.text + "px " + oldcompfont + "; }"
                 } else {
                     webView.engine.userStyleSheetLocation = "data:,body { font: " + combo.text + "px " + oldcompfont + "; }";
@@ -222,6 +232,9 @@ class Main : Application() {
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
                             " font:" + combo.text + "px " + newVal + "; }"
                     println("REACHED")
+                } else if (cur_theme == "nightBlue.css") {
+                    webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
+                            " font:" + combo.text + "px " + newVal + "; }"
                 } else {
                     webView.engine.userStyleSheetLocation = "data:,body { font: " + combo.text + "px " + newVal + "; }";
                     println("reached light theme")
@@ -293,7 +306,10 @@ class Main : Application() {
                 if (cur_theme == "darkMode.css") {
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
                             " font:" + x.toString() + "px " + compilefont.value + "; }"
-                } else {
+                } else if (cur_theme == "nightBlue.css") {
+                    webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
+                            " font:" + x.toString() + "px " + compilefont.value + "; }"
+                }else {
                     webView.engine.userStyleSheetLocation =
                         "data:,body { font: " + x.toString() + "px " + compilefont.value + "; }"
                 }
@@ -310,6 +326,9 @@ class Main : Application() {
                 combo.text = x.toString()
                 if (cur_theme == "darkMode.css") {
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
+                            " font:" + x.toString() + "px " + compilefont.value + "; }"
+                } else if (cur_theme == "nightBlue.css") {
+                    webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
                             " font:" + x.toString() + "px " + compilefont.value + "; }"
                 } else {
                     webView.engine.userStyleSheetLocation =
@@ -336,11 +355,12 @@ class Main : Application() {
         val new = MenuItem("New")
         val saveAsFile = MenuItem("Save As")
         val saveFile = MenuItem("Save")
+        val signOut = MenuItem("Sign Out")
         val saveas = Menu("Save As")
         val savepdf = MenuItem(".pdf")
         saveas.items.addAll(savepdf)
         val exitApp = MenuItem("Exit")
-        file.items.addAll(openFile, new, saveFile, saveAsFile, exitApp)
+        file.items.addAll(openFile, new, saveFile, saveAsFile, signOut,exitApp)
 
         val edit = Menu("Edit")
         val undo = MenuItem("Undo")
@@ -356,7 +376,9 @@ class Main : Application() {
         val themes = Menu("Themes")
         val themesLight = MenuItem("Light Mode")
         val themesDark = MenuItem("Dark Mode")
-        themes.items.addAll(themesLight, themesDark)
+        val themesBlue = MenuItem("Night Blue")
+        val themesPurple = MenuItem("Quiet Light")
+        themes.items.addAll(themesLight, themesDark, themesBlue, themesPurple)
         view.items.add(themes)
 
         mainMenu.getMenus().addAll(file, edit, view);
@@ -369,6 +391,7 @@ class Main : Application() {
             // clear and attach new theme
             border.getStylesheets().clear()
             border.getStylesheets().add(cur_theme)
+            userConfig = updateColorThemeConfig(userConfig, cur_theme)
 
             // menu bars
             mainMenu.getStyleClass().add("menu-bar")
@@ -390,7 +413,11 @@ class Main : Application() {
                 webView.engine.
                 setUserStyleSheetLocation("data:,body { color:#FFFFFF; background-color: #707070;" +
                         " font:" + oldcompsize + "px " + oldcompfont + "; }")
-            } else if (cur_theme == "lightMode.css") {
+            } else if (cur_theme == "nightBlue.css") {
+                webView.engine.
+                userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
+                        " font:" + oldcompsize + "px " + oldcompfont + "; }"
+            } else {
                 webView.engine.
                 setUserStyleSheetLocation("data:,body {font:" + oldcompsize + "px " + oldcompfont + ";}")
             }
@@ -490,6 +517,12 @@ class Main : Application() {
             }
         }
 
+        signOut.onAction = EventHandler {
+            stage.hide()
+            loginStage.show()
+            loginStage.scene = Scene(LoginManager().build(loginStage, stage))
+            // reset stage as well
+        }
         val OPTIONS = PegdownOptionsAdapter.flexmarkOptions(
             Extensions.ALL and (Extensions.ANCHORLINKS or Extensions.EXTANCHORLINKS_WRAP).inv(), TocExtension.create()
         ).toMutable()
@@ -506,7 +539,6 @@ class Main : Application() {
             val strfile = savefilechooser.initialDirectory.toString()
             //val html = webView.engine.executeScript("document.documentElement.outerHTML")//.toString()
             PdfConverterExtension.exportToPdf(strfile + "/test.pdf", htmlstr, "", OPTIONS)
-
         }
 
         // Undo, Redo
@@ -582,28 +614,39 @@ class Main : Application() {
             text.replaceSelection(clipboard.string)
         }
 
+        // themes helper to save font size on switch
+        fun themes_font_helper() {
+            if (winchoice.value == "Edit Window") {
+                oldeditsize = combo.text
+                oldeditfont = compilefont.value
+            } else {
+                oldcompsize = combo.text
+                oldcompfont = compilefont.value
+            }
+        }
+
         // Themes function
         themesLight.onAction = EventHandler {
             cur_theme = "lightMode.css"
-            if(winchoice.value == "Edit Window"){
-                oldcompsize = combo.text
-                oldcompfont = compilefont.value
-            }else{
-                oldeditsize = combo.text
-                oldeditfont = compilefont.value
-            }
+            themes_font_helper()
             setThemes()
         }
 
         themesDark.onAction = EventHandler {
             cur_theme = "darkMode.css"
-            if(winchoice.value == "Edit Window"){
-                oldcompsize = combo.text
-                oldcompfont = compilefont.value
-            }else{
-                oldeditsize = combo.text
-                oldeditfont = compilefont.value
-            }
+            themes_font_helper()
+            setThemes()
+        }
+
+        themesBlue.onAction = EventHandler {
+            cur_theme = "nightBlue.css"
+            themes_font_helper()
+            setThemes()
+        }
+
+        themesPurple.onAction = EventHandler {
+            cur_theme = "quietLight.css"
+            themes_font_helper()
             setThemes()
         }
 
@@ -621,6 +664,12 @@ class Main : Application() {
         stage.height = 450.0
         stage.title = "Markdown Editor"
         stage.scene = scene
-        stage.show()
+        stage.hide()
+
+        // authentication box
+        val loginScene = Scene(LoginManager().build(loginStage, stage))
+        loginStage.scene = loginScene
+        loginStage.title = "User Login"
+        loginStage.show()
     }
 }

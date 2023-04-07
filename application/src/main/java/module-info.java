@@ -19,4 +19,5 @@ module application {
     requires flexmark.ext.toc;
     requires java.net.http;
     exports net.codebot.application;
+    exports net.codebot.api;
 }

@@ -1,0 +1,21 @@
+2023-04-05 16:32:56 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "TEMP" already exists; SQL statement:
+CREATE TABLE TEMP (name VARCHAR(255), password VARCHAR(255), PRIMARY KEY (name)) [42101-214]
+2023-04-05 16:35:21 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "TEMP" already exists; SQL statement:
+CREATE TABLE TEMP (name VARCHAR(255), password VARCHAR(255), PRIMARY KEY (name)) [42101-214]
+2023-04-05 16:37:53 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "TEMP" already exists; SQL statement:
+CREATE TABLE TEMP (name VARCHAR(255), password VARCHAR(255), PRIMARY KEY (name)) [42101-214]
+2023-04-05 16:37:56 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "TEMP" already exists; SQL statement:
+CREATE TABLE TEMP (name VARCHAR(255), password VARCHAR(255), PRIMARY KEY (name)) [42101-214]
+2023-04-06 18:56:50 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "TEMP" already exists; SQL statement:
+CREATE TABLE TEMP (name VARCHAR(255), password VARCHAR(255), PRIMARY KEY (name)) [42101-214]
+2023-04-06 18:57:56 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "TEMP" already exists; SQL statement:
+CREATE TABLE TEMP (name VARCHAR(255), password VARCHAR(255), PRIMARY KEY (name)) [42101-214]
+2023-04-06 18:58:45 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "TEMP" already exists; SQL statement:
+CREATE TABLE TEMP (name VARCHAR(255), password VARCHAR(255), PRIMARY KEY (name)) [42101-214]
