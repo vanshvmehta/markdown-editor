@@ -26,6 +26,7 @@ class UserService(databaseSvc: DatabaseService) {
     }
 
     fun getUser(username: String, userPassword: String): MutableMap<String, Any> {
+        println("$username $userPassword")
         var retVal = mutableMapOf<String, Any>()
         retVal["success"] = false
         retVal["message"] = "login failed"
