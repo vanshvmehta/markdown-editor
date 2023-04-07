@@ -14,15 +14,11 @@ import com.vladsch.flexmark.util.ast.Node
 import com.vladsch.flexmark.util.data.MutableDataSet
 import com.vladsch.flexmark.util.misc.Extension
 import javafx.application.Application
-import javafx.application.Platform
-import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
 import javafx.event.EventHandler
 import javafx.scene.Scene
 import javafx.scene.control.*
-import javafx.scene.control.Alert.AlertType
 import javafx.scene.input.*
-import javafx.scene.layout.Border
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
@@ -36,66 +32,15 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintWriter
 import java.util.*
-import net.codebot.application.Forge
-
-val alert = Alert(
-    AlertType.CONFIRMATION,
-    "Are you sure you want to delete?", ButtonType.YES, ButtonType.NO, ButtonType.CANCEL
-)
-private fun newTabButton(tabPane: TabPane, vBox: VBox ): Tab? {
-    val addTab = Tab("+") // You can replace the text with an icon
-    addTab.isClosable = false
-    tabPane.selectionModel.selectedItemProperty()
-        .addListener { observable: ObservableValue<out Tab>?, oldTab: Tab?, newTab: Tab ->
-            if (newTab === addTab) {
-                val temp = Tab("New Tab", vBox )
-                closeRequestOfMainTabPane(temp, tabPane)
-                tabPane.tabs.add(tabPane.tabs.size - 1,temp ) // Adding new tab before the "button" tab
-                tabPane.selectionModel
-                    .select(tabPane.tabs.size - 2) // Selecting the tab before the button, which is the newly created one
-            }
-        }
-    return addTab
-}
-private fun closeRequestOfMainTabPane(tab: Tab, tabPane: TabPane) {
-    tab.setOnCloseRequest { e ->
-        alert.showAndWait()
-        if (alert.result == ButtonType.YES) {
-            tabPane.getTabs().remove(
-                tabPane
-                    .getSelectionModel()
-                    .getSelectedItem()
-            )
-        } else {
-            e.consume()
-        }
-    }
-}
 
 
 class Main : Application() {
     override fun start(stage: Stage) {
-
-
-        stage.isResizable = true
-        stage.width = 750.0
-        stage.height = 450.0
-        stage.title = "Markdown Editor"
-        stage.scene = Scene(Forge().deepcopy(stage,true))
-
-       // stage.show()
-
-    }
-/*
-
+        println(verifyUser("dan", "oldPwd"))
 
         //Config, setting up themeColor and default file location
         var userConfig = initConfig()
         // variables to know on startup? maybe user preferences etc.
-        //var cur_theme = "darkMode.css"
-
-        val border = BorderPane()
-
         var cur_theme = userConfig.theme
         // stage for login window
         val loginStage = Stage()
@@ -396,12 +341,10 @@ class Main : Application() {
         strikethrough.setTooltip( Tooltip("Strikethrough - Meta+5"))
         compileMd.setTooltip( Tooltip("Compile Markdown - Meta+R"))
 
-
+        val border = BorderPane()
 
         val topContainer = VBox()
         val mainMenu = MenuBar()
-        val tabPane = TabPane()
-
 
         val file = Menu("File")
         val openFile = MenuItem("Open File")
@@ -437,14 +380,11 @@ class Main : Application() {
         mainMenu.getMenus().addAll(file, edit, view);
 
         topContainer.getChildren().add(mainMenu);
-        val mainCont = VBox()
         topContainer.getChildren().add(toolbar);
 
         // stylesheets for themes
         fun setThemes() {
             // clear and attach new theme
-            //border.getStylesheets().clear()
-           // border.getStylesheets().add(cur_theme)
             border.getStylesheets().clear()
             border.getStylesheets().add(cur_theme)
             userConfig = updateColorThemeConfig(userConfig, cur_theme)
@@ -595,7 +535,6 @@ class Main : Application() {
             val strfile = savefilechooser.initialDirectory.toString()
             //val html = webView.engine.executeScript("document.documentElement.outerHTML")//.toString()
             PdfConverterExtension.exportToPdf(strfile + "/test.pdf", htmlstr, "", OPTIONS)
-
         }
 
         // Undo, Redo
@@ -738,5 +677,5 @@ class Main : Application() {
         loginStage.scene = loginScene
         loginStage.title = "User Login"
         loginStage.show()
-    }*/
+    }
 }
