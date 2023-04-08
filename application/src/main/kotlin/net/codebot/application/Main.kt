@@ -80,12 +80,12 @@ private fun closeRequestOfMainTabPane(tab: Tab, tabPane: TabPane) {
 class Main : Application() {
     override fun start(stage: Stage) {
 
-
+        var cur_file: FolderView.cur_File = FolderView.cur_File()
         stage.isResizable = true
         stage.width = 750.0
         stage.height = 450.0
         stage.title = "Markdown Editor"
-        stage.scene = Scene(Forge().deepcopy(stage,true))
+        stage.scene = Scene(Forge().deepcopy(stage,true, cur_file))
 
        // stage.show()
 

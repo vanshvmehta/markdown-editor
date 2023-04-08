@@ -13,30 +13,22 @@ import com.vladsch.flexmark.profile.pegdown.PegdownOptionsAdapter
 import com.vladsch.flexmark.util.ast.Node
 import com.vladsch.flexmark.util.data.MutableDataSet
 import com.vladsch.flexmark.util.misc.Extension
-import javafx.application.Application
-import javafx.application.Platform
 import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
 import javafx.event.EventHandler
-import javafx.geometry.Insets
-import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.*
-import javafx.scene.control.Alert.AlertType
 import javafx.scene.input.*
-import javafx.scene.layout.Border
 import javafx.scene.layout.BorderPane
-import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
+import javafx.scene.layout.StackPane
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
-import javafx.scene.text.Text
 import javafx.scene.web.WebView
 import javafx.stage.FileChooser
 import javafx.stage.Stage
 import javafx.util.converter.DoubleStringConverter
-import net.codebot.api.verifyUser
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintWriter
@@ -73,8 +65,10 @@ class Forge
         tabPane.selectionModel.selectedItemProperty()
             .addListener { observable: ObservableValue<out Tab>?, oldTab: Tab?, newTab: Tab ->
                 if (newTab === addTab) {
-                    val temp = Tab("New Tab", deepcopy( stage, false) )
-
+                    var cur_file: FolderView.cur_File = FolderView.cur_File()
+                    val temp = Tab("New Tab", deepcopy( stage, false, cur_file) )
+                    temp.userData = cur_file
+                    println("tab 2: " + temp.userData)
                     closeRequestOfMainTabPane(temp, tabPane)
                     tabPane.tabs.add(tabPane.tabs.size - 1,temp ) // Adding new tab before the "button" tab
                     tabPane.selectionModel
@@ -83,7 +77,7 @@ class Forge
             }
         return addTab
     }
-    fun deepcopy(stage: Stage, boolean: Boolean): VBox {
+    fun deepcopy(stage: Stage, boolean: Boolean, cur_file: FolderView.cur_File): VBox {
         val border = BorderPane()
 
 
@@ -96,7 +90,7 @@ class Forge
         // stage for login window
 
         val loginStage = Stage()
-        var cur_file: FolderView.cur_File = FolderView.cur_File()
+        //var cur_file: FolderView.cur_File = FolderView.cur_File()
         //val newborder = BorderPane()
         val bold = Button("B")
         val italics = Button("I")
@@ -137,6 +131,8 @@ class Forge
         compilefont.minWidth = 100.0
         compilefont.maxWidth = 100.0
 
+        val tabPane = TabPane()
+
         val toolbar = ToolBar(
 
             bold,
@@ -174,7 +170,14 @@ class Forge
         // code for status bar (bottom pane)
         val label = Label("Start Typing to Get Statistics!")
         val status = HBox(label)
-        val tree = FolderView().build(text, cur_file)
+        val getthattab = tabPane.getSelectionModel().getSelectedItem()
+        var tree = StackPane()
+        if(getthattab != null){
+            tree = FolderView().build(getthattab, text, cur_file)
+        } else {
+
+            tree = FolderView().build( Tab(), text, cur_file)
+        }
 
 
 
@@ -382,7 +385,7 @@ class Forge
 
         val topContainer = VBox()
         val mainMenu = MenuBar()
-        val tabPane = TabPane()
+
 
 
 
@@ -397,6 +400,8 @@ class Forge
         //topContainer.getChildren().add(mainCont);
 
         val t1 = Tab("New Tab", mainCont)
+        t1.userData = cur_file
+        println("tab one user data: " +  t1.userData )
         closeRequestOfMainTabPane(t1, tabPane)
 
         tabPane.getTabs().add(t1);
@@ -510,10 +515,11 @@ class Forge
                 val selectedFile = filechooser.showOpenDialog(Stage())
                 try {
                     val scanner = Scanner(selectedFile);
-                    val temp = tabPane.getSelectionModel().getSelectedItem().
-                    content.lookup("BorderPane")
+                    val temp4 = tabPane.getSelectionModel().getSelectedItem()
+                    val temp = temp4. content.lookup("BorderPane")
+                    val temp3 = tabPane.getSelectionModel().getSelectedItem().userData as FolderView.cur_File
 
-                    if (temp != null){
+                    if (temp != null && temp4 != null){
                         var temp = temp as BorderPane
                         //temp.center.lookup("TextArea")
                         var temp2 = temp.center.lookup("TextArea") as TextArea
@@ -523,9 +529,10 @@ class Forge
                             temp2.appendText(scanner.nextLine() + "\n");
                         }
                         tabPane.getSelectionModel().getSelectedItem().text = selectedFile.name
-                        temp.left = FolderView().build(temp2, cur_file, selectedFile.parentFile.absolutePath,true)
+                        temp.left = FolderView().build(temp4,temp2,
+                            temp3, selectedFile.parentFile.absolutePath,true)
                         temp.left.getStyleClass().add("folder-view")
-                        cur_file.path2file = selectedFile.absolutePath
+                        temp3.path2file = selectedFile.absolutePath
                         userConfig = updateFileLocationConfig(userConfig, selectedFile.parentFile.absolutePath)
                     }
 
@@ -537,9 +544,12 @@ class Forge
 
             //SaveFile Function
             saveFile.onAction = EventHandler {
-                if (cur_file.path2file != null) {
+
+                val temp3 = tabPane.getSelectionModel().getSelectedItem().userData as FolderView.cur_File
+                println("savefile path: "+temp3)
+                if (temp3.path2file != null) {
                     try {
-                        val printWriter = PrintWriter(cur_file.path2file)
+                        val printWriter = PrintWriter(temp3.path2file)
                         val temp = tabPane.getSelectionModel().getSelectedItem().
                         content.lookup("BorderPane")
 
@@ -594,7 +604,8 @@ class Forge
             alert.showAndWait()
             if (alert.result == ButtonType.YES) {
                 stage.hide()
-                stage.scene = Scene(Forge().deepcopy(stage,true))
+                var cur_file2: FolderView.cur_File = FolderView.cur_File()
+                stage.scene = Scene(Forge().deepcopy(stage,true, cur_file2))
                 //loginStage.show()
                // loginStage.scene = Scene(LoginManager().build(loginStage, stage))
             }
