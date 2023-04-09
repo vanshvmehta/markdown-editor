@@ -63,4 +63,36 @@ html {
 
 .tool-bar .combo-box-base .text {
 }
+.tab-pane .tab-header-background
+ {
+     -fx-background-color: #947F9C;
+     -fx-border-style:hidden hidden solid hidden;
+          -fx-padding: 1;
+
+ }
+ .tab-pane .tab
+ {
+     -fx-background-color: #FEFFFE;
+     -fx-focus-color: transparent;
+     -fx-faint-focus-color: transparent;
+
+ }
+ .tab .tab-label {
+
+
+     -fx-alignment: CENTER;
+ }
+
+
+
+ .tab:selected .tab-label {
+     -fx-alignment: CENTER;
+ }
+
+ .tab-pane {
+    -fx-border-style:solid hidden hidden hidden;
+     -fx-padding: 1;
+      -fx-background-color: #947F9C;
+
+ }
 

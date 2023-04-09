@@ -19,11 +19,7 @@ import javafx.event.EventHandler
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.input.*
-import javafx.scene.layout.BorderPane
-import javafx.scene.layout.HBox
-import javafx.scene.layout.Priority
-import javafx.scene.layout.StackPane
-import javafx.scene.layout.VBox
+import javafx.scene.layout.*
 import javafx.scene.text.Font
 import javafx.scene.web.WebView
 import javafx.stage.FileChooser
@@ -31,7 +27,10 @@ import javafx.stage.Stage
 import javafx.util.converter.DoubleStringConverter
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.IOException
 import java.io.PrintWriter
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.*
 
 class Forge
@@ -84,9 +83,9 @@ class Forge
         //Config, setting up themeColor and default file location
         var userConfig = initConfig()
         // variables to know on startup? maybe user preferences etc.
-        var cur_theme = "darkMode.css"
+        //var cur_theme = "darkMode.css"
         var user = ""
-        //var cur_theme = userConfig.theme
+        var cur_theme = userConfig.theme
         // stage for login window
 
         val loginStage = Stage()
@@ -411,14 +410,19 @@ class Forge
         }
 
 
+
+
+
         tabPane.getTabs().add(t2);
 
         fun setThemes() {
+            println(cur_theme)
             // clear and attach new theme
             //border.getStylesheets().clear()
             // border.getStylesheets().add(cur_theme)
             topContainer.getStylesheets().clear()
             topContainer.getStylesheets().add(cur_theme)
+            userConfig = updateColorThemeConfig(userConfig, cur_theme)
             // menu bars
             mainMenu.getStyleClass().add("menu-bar")
             mainMenu.getStyleClass().add("menu")
@@ -434,19 +438,38 @@ class Forge
             // left stylesheets in FolderView.kt
             left.getStyleClass().add("folder-view")
 
+            //cur_theme = userConfig.theme
+
+            println(tabPane.getSelectionModel().getSelectedItem())
+            println("Updated theme")
+            println(cur_theme)
             // compiled area
-            if (cur_theme == "darkMode.css") {
-                webView.engine.
-                setUserStyleSheetLocation("data:,body { color:#FFFFFF; background-color: #707070;" +
-                        " font:" + oldcompsize + "px " + oldcompfont + "; }")
-            } else if (cur_theme == "nightBlue.css") {
-                webView.engine.
-                userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
-                        " font:" + oldcompsize + "px " + oldcompfont + "; }"
-            } else  {
-                webView.engine.
-                setUserStyleSheetLocation("data:,body {font:" + oldcompsize + "px " + oldcompfont + ";}")
+            tabPane.tabs.forEach { tab ->
+                var temptab = tab.content//.lookup("BorderPane")
+                if(temptab != null){
+                    temptab = temptab.lookup("BorderPane")
+                    if(temptab != null){
+                        temptab = temptab as BorderPane
+                        var tempview = temptab.right.lookup("WebView") as WebView
+                        if (cur_theme == "darkMode.css") {
+
+                            tempview.engine.setUserStyleSheetLocation("data:,body { color:#FFFFFF; background-color: #707070;" +
+                                    " font:" + oldcompsize + "px " + oldcompfont + "; }")
+                        } else if (cur_theme == "nightBlue.css") {
+                            tempview.engine.
+                            userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
+                                    " font:" + oldcompsize + "px " + oldcompfont + "; }"
+                        } else  {
+                            tempview.engine.
+                            setUserStyleSheetLocation("data:,body {font:" + oldcompsize + "px " + oldcompfont + ";}")
+                        }
+                    }
+
+                }
+
             }
+
+
         }
 
 
@@ -458,12 +481,13 @@ class Forge
             val new = MenuItem("New")
             val saveAsFile = MenuItem("Save As")
             val saveFile = MenuItem("Save")
+            val deleteFile = MenuItem("Delete File")
             val signOut = MenuItem("Sign Out")
             val saveas = Menu("Save As")
             val savepdf = MenuItem(".pdf")
             saveas.items.addAll(savepdf)
             val exitApp = MenuItem("Exit")
-            file.items.addAll(openFile, new, saveFile, saveAsFile, signOut, exitApp)
+            file.items.addAll(openFile, new, saveFile, saveAsFile,deleteFile, signOut, exitApp)
 
             val edit = Menu("Edit")
             val undo = MenuItem("Undo")
@@ -560,11 +584,15 @@ class Forge
                             //tabPane.getSelectionModel().getSelectedItem().text = cur_file.path2file
                             printWriter.write(temp2.text);
                             printWriter.close();
+
+
                         }
 
                     } catch (e: FileNotFoundException) {
                         e.printStackTrace();
                     }
+                    println("Attempting to update your file remotely!")
+                    updateFile(user,temp3.path2file)
                 }
             }
 
@@ -581,10 +609,9 @@ class Forge
                 if (file != null) {
                     try {
                         val printWriter = PrintWriter(file);
-                        val temp = tabPane.getSelectionModel().getSelectedItem().
-                        content.lookup("BorderPane")
+                        val temp = tabPane.getSelectionModel().getSelectedItem().content.lookup("BorderPane")
 
-                        if (temp != null){
+                        if (temp != null) {
                             var temp = temp as BorderPane
                             //temp.center.lookup("TextArea")
                             var temp2 = temp.center.lookup("TextArea") as TextArea
@@ -595,7 +622,7 @@ class Forge
                             temp.left = FolderView().build(text, cur_file, file.parentFile.absolutePath,true)
                             temp.left.getStyleClass().add("folder-view")*/
                             val temp3 = tabPane.getSelectionModel().getSelectedItem().userData as FolderView.cur_File
-                            if(temp3 != null){
+                            if (temp3 != null) {
                                 temp3.path2file = file.absolutePath
                                 userConfig = updateFileLocationConfig(userConfig, file.parentFile.absolutePath)
                             }
@@ -605,11 +632,49 @@ class Forge
                     } catch (e: FileNotFoundException) {
                         e.printStackTrace();
                     }
-                    println("Uploading your new file!")
-                    uploadFile("simon", file)
+                    println("Attempting to upload your file remotely!")
+                    uploadFile(user, file)
+                }
+            }
+
+        deleteFile.onAction = EventHandler {// have to close file first
+            val temp3 = tabPane.getSelectionModel().getSelectedItem().userData as FolderView.cur_File
+
+            if (temp3.path2file != null) {
+                println("Attempting to delete your file remotely!")
+                delFile(user, temp3.path2file)
+                try {
+                    val result = Files.deleteIfExists(Paths.get(temp3.path2file))
+
+                    if (result) {
+                        println("Deletion succeeded.")
+                    } else {
+                        println("file trying to delete: " + temp3.path2file)
+                        println("Deletion failed.")
+                    }
+                } catch (e: IOException) {
+                    println("Deletion failed.")
+                    e.printStackTrace()
+                }
+                if(tabPane.tabs.size == 2){
+                    var cur_file: FolderView.cur_File = FolderView.cur_File()
+                    val temp = Tab("New Tab", deepcopy( stage, false, cur_file) )
+                    temp.userData = cur_file
+                    println("tab 2: " + temp.userData)
+                    closeRequestOfMainTabPane(temp, tabPane)
+                    tabPane.tabs.add(tabPane.tabs.size - 1,temp ) // Adding new tab before the "button" tab
+                    tabPane.tabs.remove(tabPane.getSelectionModel().getSelectedItem())
+                    tabPane.selectionModel
+                        .select(tabPane.tabs.size - 3) // Se
+
+                } else {
+                    tabPane.tabs.remove(tabPane.getSelectionModel().getSelectedItem())
                 }
 
+
+
             }
+        }
 
         signOut.onAction = EventHandler {
 
@@ -730,6 +795,7 @@ class Forge
         // Themes function
         themesLight.onAction = EventHandler {
             cur_theme = "lightMode.css"
+               //userConfig.theme =  cur_theme
             themes_font_helper()
             setThemes()
         }

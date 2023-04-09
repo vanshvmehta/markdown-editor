@@ -79,8 +79,6 @@ html {
           -fx-padding: 1;
 
  }
-
-
  .tab-pane .tab
  {
      -fx-background-color: #707070;
@@ -88,8 +86,6 @@ html {
      -fx-faint-focus-color: transparent;
 
  }
-
-
  .tab .tab-label {
 
      -fx-text-fill: #FFFFFF;
