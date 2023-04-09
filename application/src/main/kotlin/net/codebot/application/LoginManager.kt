@@ -49,6 +49,7 @@ class LoginManager {
 
         guestBtn.onAction = EventHandler {
             markdown.show()
+            self.title = ""
             self.hide()
         }
 
@@ -65,6 +66,7 @@ class LoginManager {
                 val verified = verifyUser(user, password)
                 if (verified) {
                     markdown.show()
+                    self.title = user
                     self.hide()
                     getUserDirectory(user)
                 } else {

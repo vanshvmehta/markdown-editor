@@ -44,6 +44,10 @@ fun getUserDirectory (user: String) {
 }
 
 fun updateFile(user: String, path: String?) {
+    if (user.isEmpty()) {
+        println("Guest user requires no update")
+        return
+    }
     val file = File(path)
     val realPath = Paths.get(file.path)
 
@@ -61,11 +65,17 @@ fun updateFile(user: String, path: String?) {
         if (Files.isSameFile(mdPath, realPath)) {
             println("Updating file: " + file.name + " for user: " + user + "!")
             postFile(user, "root/" + file.name, file.readText())
+            return
         }
     }
+    println("File wasn't updated because it wasn't in your directory.")
 }
 
 fun uploadFile(user: String, file: File) {
+    if (user.isEmpty()) {
+        println("Guest user requires no upload")
+        return
+    }
     val realPath = Paths.get(file.path)
 
     val mdPath = Paths.get(System.getProperty("user.home"))
@@ -82,6 +92,8 @@ fun uploadFile(user: String, file: File) {
         if (Files.isSameFile(mdPath, realPath)) {
             putFile(user, "root", file.name, file.readText())
             postFile(user, "root/" + file.name, file.readText())
+            return
         }
     }
+    println("File wasn't uploaded because it wasn't saved to your directory.")
 }

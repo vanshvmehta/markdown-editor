@@ -30,7 +30,10 @@ import javafx.util.converter.DoubleStringConverter
 import net.codebot.api.verifyUser
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.IOException
 import java.io.PrintWriter
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.*
 
 
@@ -43,6 +46,7 @@ class Main : Application() {
         // variables to know on startup? maybe user preferences etc.
         var cur_theme = userConfig.theme
         // stage for login window
+        var user = ""
         val loginStage = Stage()
 
         var cur_file: FolderView.cur_File = FolderView.cur_File()
@@ -351,12 +355,13 @@ class Main : Application() {
         val new = MenuItem("New")
         val saveAsFile = MenuItem("Save As")
         val saveFile = MenuItem("Save")
+        val deleteFile = MenuItem("Delete File")
         val signOut = MenuItem("Sign Out")
         val saveas = Menu("Save As")
         val savepdf = MenuItem(".pdf")
         saveas.items.addAll(savepdf)
         val exitApp = MenuItem("Exit")
-        file.items.addAll(openFile, new, saveFile, saveAsFile, signOut,exitApp)
+        file.items.addAll(openFile, new, saveFile, saveAsFile, deleteFile, signOut, exitApp)
 
         val edit = Menu("Edit")
         val undo = MenuItem("Undo")
@@ -489,8 +494,8 @@ class Main : Application() {
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace();
                 }
-                println("Updating File for User (if it exists!)")
-                updateFile("simon", cur_file.path2file)
+                println("Attempting to update your file remotely!")
+                updateFile(user, cur_file.path2file)
             }
         }
 
@@ -519,8 +524,26 @@ class Main : Application() {
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace();
                 }
-                println("Uploading your new file!")
-                uploadFile("simon", file)
+                println("Attempting to upload your file remotely!")
+                uploadFile(user, file)
+            }
+        }
+
+        deleteFile.onAction = EventHandler {// have to close file first
+            if (cur_file.path2file != null) {
+                println("Attempting to delete your file remotely!")
+                delFile(user, cur_file.path2file)
+                try {
+                    val result = Files.deleteIfExists(Paths.get(cur_file.path2file))
+                    if (result) {
+                        println("Deletion succeeded.")
+                    } else {
+                        println("Deletion failed.")
+                    }
+                } catch (e: IOException) {
+                    println("Deletion failed.")
+                    e.printStackTrace()
+                }
             }
         }
 
@@ -688,5 +711,9 @@ class Main : Application() {
         loginStage.scene = loginScene
         loginStage.title = "User Login"
         loginStage.show()
+
+        loginStage.onHidden = EventHandler {
+            user = loginStage.title
+        }
     }
 }
