@@ -85,7 +85,7 @@ class Forge
         var userConfig = initConfig()
         // variables to know on startup? maybe user preferences etc.
         var cur_theme = "darkMode.css"
-
+        var user = ""
         //var cur_theme = userConfig.theme
         // stage for login window
 
@@ -803,6 +803,8 @@ class Forge
         border.left = left
         border.right = right
         setThemes()
+        stage.width = userConfig.defaultWidth
+        stage.height = userConfig.defaultHeight
 
         stage.widthProperty().addListener{ obs, oldValue, newValue ->
             // stage.setWidth(newValue as Double)
@@ -819,6 +821,10 @@ class Forge
             loginStage.scene = loginScene
             loginStage.title = "User Login"
             loginStage.show()
+
+            loginStage.onHidden = EventHandler {
+                user = loginStage.title
+            }
 
 
             return topContainer
