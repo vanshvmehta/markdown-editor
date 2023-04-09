@@ -16,7 +16,7 @@ data class VerifyResponse(
 )
 
 fun verifyUser(user: String, pwd: String): Boolean {
-    val baseURL = "http://ec2-18-218-223-84.us-east-2.compute.amazonaws.com:8080/user/verify"
+    val baseURL = "http://ec2-18-118-140-38.us-east-2.compute.amazonaws.com:8080/user/verify"
     val client = HttpClient.newBuilder().build();
     val request = HttpRequest.newBuilder()
         .uri(URI.create("$baseURL?name=$user&pwd=$pwd"))

@@ -72,4 +72,44 @@ html {
 .tool-bar .combo-box-base .text {
     -fx-fill: #FFFFFF;
 }
+.tab-pane .tab-header-background
+ {
+     -fx-background-color: #3B3B3B;
+     -fx-border-style:hidden hidden solid hidden;
+          -fx-padding: 1;
+
+ }
+
+
+ .tab-pane .tab
+ {
+     -fx-background-color: #707070;
+     -fx-focus-color: transparent;
+     -fx-faint-focus-color: transparent;
+
+ }
+
+
+ .tab .tab-label {
+
+     -fx-text-fill: #FFFFFF;
+     -fx-alignment: CENTER;
+ }
+
+ .tab .tab-close-button {
+     -fx-background-color: #FFFFFF;
+ }
+
+ .tab:selected .tab-label {
+     -fx-alignment: CENTER;
+     -fx-text-fill: #FFFFFF;
+ }
+
+ .tab-pane {
+    -fx-border-style:solid;
+     -fx-padding: 1;
+      -fx-background-color: #3B3B3B;
+
+ }
+
 

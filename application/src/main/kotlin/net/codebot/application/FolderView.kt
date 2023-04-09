@@ -1,5 +1,6 @@
 package net.codebot.application
 import javafx.scene.Node
+import javafx.scene.control.Tab
 import javafx.scene.control.TextArea
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
@@ -18,7 +19,7 @@ class FolderView {
     data class cur_File (
         var path2file: String? = null
     )
-    fun build(text: TextArea, cur_file: cur_File, pathname: String = "No Working Directory", dir_selected: Boolean = false) : StackPane {
+    fun build(tab: Tab, text: TextArea, cur_file: cur_File, pathname: String = "No Working Directory", dir_selected: Boolean = false) : StackPane {
         // images for file directory
         val folder_icon = ImageView(Image("https://www.iconpacks.net/icons/2/free-folder-icon-1485-thumb.png"))
         val image_icon = ImageView(Image("https://cdn-icons-png.flaticon.com/512/1160/1160358.png"))
@@ -72,6 +73,7 @@ class FolderView {
                         while (scanner.hasNextLine()) {
                             text.appendText(scanner.nextLine() + "\n");
                     }
+                    tab.text = newValue.value.toString()
                     update_current_file(cur_file, path)
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace();
