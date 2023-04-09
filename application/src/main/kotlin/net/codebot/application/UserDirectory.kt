@@ -1,9 +1,6 @@
 package net.codebot.application
 
-import net.codebot.api.getDirectory
-import net.codebot.api.getFile
-import net.codebot.api.postFile
-import net.codebot.api.putFile
+import net.codebot.api.*
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
@@ -14,7 +11,6 @@ fun deleteDirectory(path: String) {
     val file = File(path)
     try {
         file.deleteRecursively()
-        println("Directory deleted successfully.")
     } catch (e: Exception) {
         e.printStackTrace()
     }
@@ -35,6 +31,7 @@ fun getUserDirectory (user: String) {
     Files.createDirectories(userPath)
 
     // grab data from backend and write to user's directory
+    println("Downloading files for user: " + user)
     val rootData = getDirectory(user, "root").body
     // for every file from the user's online directory
     for (obj: Map<String, String> in rootData) {
@@ -63,12 +60,13 @@ fun updateFile(user: String, path: String?) {
 
     if (Files.exists(mdPath)) {
         if (Files.isSameFile(mdPath, realPath)) {
-            println("Updating file: " + file.name + " for user: " + user + "!")
+            println("Updating file: " + file.name)
+            println("For user: " + user)
             postFile(user, "root/" + file.name, file.readText())
             return
         }
     }
-    println("File wasn't updated because it wasn't in your directory.")
+    println("No update for remote directory.")
 }
 
 fun uploadFile(user: String, file: File) {
@@ -90,10 +88,41 @@ fun uploadFile(user: String, file: File) {
 
     if (Files.exists(mdPath)) {
         if (Files.isSameFile(mdPath, realPath)) {
+            println("Uploading file: " + file.name)
+            println("For user: " + user)
             putFile(user, "root", file.name, file.readText())
             postFile(user, "root/" + file.name, file.readText())
             return
         }
     }
-    println("File wasn't uploaded because it wasn't saved to your directory.")
+    println("No upload for remote directory.")
+}
+
+fun delFile(user : String, path : String?) {
+    if (user.isEmpty()) {
+        println("Guest user requires no delete")
+        return
+    }
+    val file = File(path)
+    val realPath = Paths.get(file.path)
+
+    val mdPath = Paths.get(System.getProperty("user.home"))
+        .resolve(Paths.get(".Markdown"))
+        .resolve(Paths.get(user))
+        .resolve(Paths.get("root"))
+        .resolve(Paths.get(file.name))
+
+    println("Comparing paths:")
+    println(realPath)
+    println(mdPath)
+
+    if (Files.exists(mdPath)) {
+        if (Files.isSameFile(mdPath, realPath)) {
+            println("Deleting file: " + file.name)
+            println("For user: " + user)
+            deleteFile(user, "root/" + file.name)
+            return
+        }
+    }
+    println("No delete for remote directory.")
 }
