@@ -591,12 +591,24 @@ class Forge
                             tabPane.getSelectionModel().getSelectedItem().text = file.name
                             printWriter.write(temp2.text);
                             printWriter.close();
+                            /*
+                            temp.left = FolderView().build(text, cur_file, file.parentFile.absolutePath,true)
+                            temp.left.getStyleClass().add("folder-view")*/
+                            val temp3 = tabPane.getSelectionModel().getSelectedItem().userData as FolderView.cur_File
+                            if(temp3 != null){
+                                temp3.path2file = file.absolutePath
+                                userConfig = updateFileLocationConfig(userConfig, file.parentFile.absolutePath)
+                            }
+
                         }
 
                     } catch (e: FileNotFoundException) {
                         e.printStackTrace();
                     }
+                    println("Uploading your new file!")
+                    uploadFile("simon", file)
                 }
+
             }
 
         signOut.onAction = EventHandler {
@@ -791,6 +803,16 @@ class Forge
         border.left = left
         border.right = right
         setThemes()
+
+        stage.widthProperty().addListener{ obs, oldValue, newValue ->
+            // stage.setWidth(newValue as Double)
+            userConfig = updateWidthConfig(userConfig, newValue as Double)
+        }
+
+        stage.heightProperty().addListener{ obs, oldValue, newValue ->
+            // stage.setHeight(newValue as Double)
+            userConfig = updateHeightConfig(userConfig, newValue as Double)
+        }
 
         if(boolean){
             val loginScene = Scene(LoginManager().build(loginStage, stage))

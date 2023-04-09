@@ -3,7 +3,6 @@ package net.codebot.application
 import javafx.event.EventHandler
 import javafx.geometry.Insets
 import javafx.geometry.Pos
-import javafx.scene.Scene
 import javafx.scene.control.Button
 import javafx.scene.control.Label
 import javafx.scene.control.PasswordField
@@ -15,7 +14,6 @@ import javafx.scene.paint.Color
 import javafx.scene.text.Text
 import javafx.stage.Stage
 import net.codebot.api.verifyUser
-
 
 class LoginManager {
     fun build(self: Stage, markdown: Stage): StackPane {
@@ -68,12 +66,12 @@ class LoginManager {
                 if (verified) {
                     markdown.show()
                     self.hide()
+                    getUserDirectory(user)
                 } else {
                     actiontarget.setText("Invalid password.")
                 }
             }
         }
-
         return StackPane(grid)
     }
 }
