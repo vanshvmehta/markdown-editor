@@ -1,0 +1,66 @@
+html {
+    background-color: #FEFFFE;
+}
+
+.text-area{
+    -fx-control-inner-background: #FEFFFE;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.text-area .scroll-bar{
+    -fx-background-color: #FEFFFE;
+}
+
+.folder-view{
+    -fx-control-inner-background: #FEFFFE;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-selection-bar: #969A9F;
+}
+
+.folder-view .scroll-bar{
+    -fx-background-color: #FEFFFE;
+}
+
+.status-text{
+    -fx-text-fill: #FFFFFF;
+}
+
+.status-bar{
+    -fx-background-color: #600170;
+}
+
+.menu .label{
+    -fx-control-inner-background: #FEFFFE;
+}
+
+.menu-bar{
+    -fx-background-color: #947F9C;
+    -fx-control-inner-background: #FEFFFE;
+    -fx-selection-bar: #969A9F;
+}
+.menu-item:focused{
+     -fx-background-color: #969A9F;
+}
+
+.tool-bar{
+    -fx-background-color: #947F9C;
+}
+
+.tool-bar .button{
+    -fx-background-color: #FEFFFE;
+}
+
+.tool-bar .text-field{
+    -fx-background-color: #FEFFFE;
+}
+
+.tool-bar .combo-box-base{
+    -fx-background-color: #FEFFFE;
+    -fx-control-inner-background: #FEFFFE;
+}
+
+.tool-bar .combo-box-base .text {
+}
+
