@@ -14,23 +14,15 @@ import com.vladsch.flexmark.util.ast.Node
 import com.vladsch.flexmark.util.data.MutableDataSet
 import com.vladsch.flexmark.util.misc.Extension
 import javafx.application.Application
-import javafx.application.Platform
-import javafx.beans.value.ObservableValue
 import javafx.collections.FXCollections
 import javafx.event.EventHandler
-import javafx.geometry.Insets
-import javafx.geometry.Pos
 import javafx.scene.Scene
 import javafx.scene.control.*
-import javafx.scene.control.Alert.AlertType
 import javafx.scene.input.*
-import javafx.scene.layout.Border
 import javafx.scene.layout.BorderPane
-import javafx.scene.layout.GridPane
 import javafx.scene.layout.HBox
 import javafx.scene.layout.VBox
 import javafx.scene.text.Font
-import javafx.scene.text.Text
 import javafx.scene.web.WebView
 import javafx.stage.FileChooser
 import javafx.stage.Stage
@@ -38,71 +30,27 @@ import javafx.util.converter.DoubleStringConverter
 import net.codebot.api.verifyUser
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.IOException
 import java.io.PrintWriter
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.*
-import net.codebot.application.Forge
-
-val alert = Alert(
-    AlertType.CONFIRMATION,
-    "Are you sure you want to delete?", ButtonType.YES, ButtonType.NO, ButtonType.CANCEL
-)
-private fun newTabButton(tabPane: TabPane, vBox: VBox ): Tab? {
-    val addTab = Tab("+") // You can replace the text with an icon
-    addTab.isClosable = false
-    tabPane.selectionModel.selectedItemProperty()
-        .addListener { observable: ObservableValue<out Tab>?, oldTab: Tab?, newTab: Tab ->
-            if (newTab === addTab) {
-                val temp = Tab("New Tab", vBox )
-                closeRequestOfMainTabPane(temp, tabPane)
-                tabPane.tabs.add(tabPane.tabs.size - 1,temp ) // Adding new tab before the "button" tab
-                tabPane.selectionModel
-                    .select(tabPane.tabs.size - 2) // Selecting the tab before the button, which is the newly created one
-            }
-        }
-    return addTab
-}
-private fun closeRequestOfMainTabPane(tab: Tab, tabPane: TabPane) {
-    tab.setOnCloseRequest { e ->
-        alert.showAndWait()
-        if (alert.result == ButtonType.YES) {
-            tabPane.getTabs().remove(
-                tabPane
-                    .getSelectionModel()
-                    .getSelectedItem()
-            )
-        } else {
-            e.consume()
-        }
-    }
-}
 
 
 class Main : Application() {
     override fun start(stage: Stage) {
-
-        var cur_file: FolderView.cur_File = FolderView.cur_File()
-        stage.isResizable = true
-        stage.width = 750.0
-        stage.height = 450.0
-        stage.title = "Markdown Editor"
-
-        stage.scene = Scene(Forge().deepcopy(stage,true, cur_file))
-
-       // stage.show()
-
-    }
-/*
-
+        println(verifyUser("dan", "oldPwd"))
 
         //Config, setting up themeColor and default file location
         var userConfig = initConfig()
         // variables to know on startup? maybe user preferences etc.
         //var cur_theme = "darkMode.css"
 
-        val border = BorderPane()
+       // val border = BorderPane()
 
         var cur_theme = userConfig.theme
         // stage for login window
+        var user = ""
         val loginStage = Stage()
 
         var cur_file: FolderView.cur_File = FolderView.cur_File()
@@ -401,24 +349,23 @@ class Main : Application() {
         strikethrough.setTooltip( Tooltip("Strikethrough - Meta+5"))
         compileMd.setTooltip( Tooltip("Compile Markdown - Meta+R"))
 
-
+        val border = BorderPane()
 
         val topContainer = VBox()
         val mainMenu = MenuBar()
-        val tabPane = TabPane()
-
 
         val file = Menu("File")
         val openFile = MenuItem("Open File")
         val new = MenuItem("New")
         val saveAsFile = MenuItem("Save As")
         val saveFile = MenuItem("Save")
+        val deleteFile = MenuItem("Delete File")
         val signOut = MenuItem("Sign Out")
         val saveas = Menu("Save As")
         val savepdf = MenuItem(".pdf")
         saveas.items.addAll(savepdf)
         val exitApp = MenuItem("Exit")
-        file.items.addAll(openFile, new, saveFile, saveAsFile, signOut,exitApp)
+        file.items.addAll(openFile, new, saveFile, saveAsFile, deleteFile, signOut, exitApp)
 
         val edit = Menu("Edit")
         val undo = MenuItem("Undo")
@@ -442,14 +389,11 @@ class Main : Application() {
         mainMenu.getMenus().addAll(file, edit, view);
 
         topContainer.getChildren().add(mainMenu);
-        val mainCont = VBox()
         topContainer.getChildren().add(toolbar);
 
         // stylesheets for themes
         fun setThemes() {
             // clear and attach new theme
-            //border.getStylesheets().clear()
-           // border.getStylesheets().add(cur_theme)
             border.getStylesheets().clear()
             border.getStylesheets().add(cur_theme)
             userConfig = updateColorThemeConfig(userConfig, cur_theme)
@@ -554,6 +498,8 @@ class Main : Application() {
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace();
                 }
+                println("Attempting to update your file remotely!")
+                updateFile(user, cur_file.path2file)
             }
         }
 
@@ -582,8 +528,26 @@ class Main : Application() {
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace();
                 }
-                println("Uploading your new file!")
-                uploadFile("simon", file)
+                println("Attempting to upload your file remotely!")
+                uploadFile(user, file)
+            }
+        }
+
+        deleteFile.onAction = EventHandler {// have to close file first
+            if (cur_file.path2file != null) {
+                println("Attempting to delete your file remotely!")
+                //delFile(user, cur_file.path2file)
+                try {
+                    val result = Files.deleteIfExists(Paths.get(cur_file.path2file))
+                    if (result) {
+                        println("Deletion succeeded.")
+                    } else {
+                        println("Deletion failed.")
+                    }
+                } catch (e: IOException) {
+                    println("Deletion failed.")
+                    e.printStackTrace()
+                }
             }
         }
 
@@ -609,7 +573,6 @@ class Main : Application() {
             val strfile = savefilechooser.initialDirectory.toString()
             //val html = webView.engine.executeScript("document.documentElement.outerHTML")//.toString()
             PdfConverterExtension.exportToPdf(strfile + "/test.pdf", htmlstr, "", OPTIONS)
-
         }
 
         // Undo, Redo
@@ -752,5 +715,9 @@ class Main : Application() {
         loginStage.scene = loginScene
         loginStage.title = "User Login"
         loginStage.show()
-    }*/
+
+        loginStage.onHidden = EventHandler {
+            user = loginStage.title
+        }
+    }
 }
