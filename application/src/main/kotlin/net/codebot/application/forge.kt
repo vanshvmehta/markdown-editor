@@ -283,8 +283,20 @@ class Forge
                 text.font = Font(compilefont.value, newVal.toDouble())
             }else {
                 val x = combo.text.toDouble()
-                webView.engine.userStyleSheetLocation =
-                    "data:,body { font: " + x.toString() + "px " + compilefont.value + "; }";
+                cur_theme = userConfig.theme
+                if (cur_theme == "darkMode.css"){
+                    webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
+                            " font:" + x.toString() + "px " + compilefont.value + "; }"
+                    println("REACHED")
+                } else if (cur_theme == "nightBlue.css") {
+                    webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
+                            " font:" + x.toString()+ "px " + compilefont.value + "; }"
+                } else {
+                    webView.engine.userStyleSheetLocation = "data:,body { font: " + x.toString() + "px " + compilefont.value + "; }";
+                    //println("reached light theme")
+                }
+
+
             }
         }
 
@@ -339,6 +351,7 @@ class Forge
             }else {
                 val x = combo.text.toDouble() - 1
                 combo.text = x.toString()
+                cur_theme = userConfig.theme
                 if (cur_theme == "darkMode.css") {
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
                             " font:" + x.toString() + "px " + compilefont.value + "; }"
@@ -360,6 +373,7 @@ class Forge
             }else {
                 val x = combo.text.toDouble() + 1
                 combo.text = x.toString()
+                cur_theme = userConfig.theme
                 if (cur_theme == "darkMode.css") {
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
                             " font:" + x.toString() + "px " + compilefont.value + "; }"
