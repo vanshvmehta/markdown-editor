@@ -80,12 +80,11 @@ class Forge
     fun deepcopy(stage: Stage, boolean: Boolean, cur_file: FolderView.cur_File): VBox {
         val border = BorderPane()
 
-
+        var user = ""
         //Config, setting up themeColor and default file location
-        var userConfig = initConfig()
+        var userConfig = initConfig(user)
         // variables to know on startup? maybe user preferences etc.
         //var cur_theme = "darkMode.css"
-        var user = ""
         var cur_theme = userConfig.theme
         // stage for login window
 
@@ -176,7 +175,6 @@ class Forge
         if(getthattab != null){
             tree = FolderView().build(getthattab, text, cur_file)
         } else {
-
             tree = FolderView().build( Tab(), text, cur_file)
         }
 
@@ -438,7 +436,7 @@ class Forge
             // border.getStylesheets().add(cur_theme)
             topContainer.getStylesheets().clear()
             topContainer.getStylesheets().add(cur_theme)
-            userConfig = updateColorThemeConfig(userConfig, cur_theme)
+            userConfig = updateColorThemeConfig(userConfig, cur_theme, user)
             // menu bars
             mainMenu.getStyleClass().add("menu-bar")
             mainMenu.getStyleClass().add("menu")
@@ -710,6 +708,14 @@ class Forge
                 stage.hide()
                 var cur_file2: FolderView.cur_File = FolderView.cur_File()
                 stage.scene = Scene(Forge().deepcopy(stage,true, cur_file2))
+                var rootPath = Paths.get(System.getProperty("user.home"))
+                val partialPath = Paths.get(".MarkDown/" + user)
+                val resolvedPath: Path = rootPath.resolve(partialPath)
+                deleteDirectory(resolvedPath.toString())
+                user = ""
+                rootPath = Paths.get(System.getProperty("user.home"))
+                val configFile = File(rootPath.resolve(Paths.get(".Markdown/config.txt")).toString())
+                Files.deleteIfExists(configFile.toPath())
                 //loginStage.show()
                // loginStage.scene = Scene(LoginManager().build(loginStage, stage))
             }
@@ -902,12 +908,12 @@ class Forge
 
         stage.widthProperty().addListener{ obs, oldValue, newValue ->
             // stage.setWidth(newValue as Double)
-            userConfig = updateWidthConfig(userConfig, newValue as Double)
+            userConfig = updateWidthConfig(userConfig, newValue as Double, user)
         }
 
         stage.heightProperty().addListener{ obs, oldValue, newValue ->
             // stage.setHeight(newValue as Double)
-            userConfig = updateHeightConfig(userConfig, newValue as Double)
+            userConfig = updateHeightConfig(userConfig, newValue as Double, user)
         }
 
         if(boolean){
@@ -918,6 +924,14 @@ class Forge
 
             loginStage.onHidden = EventHandler {
                 user = loginStage.title
+                getConfig(user)
+
+                userConfig = initConfig(user)
+                cur_theme = userConfig.theme
+                setThemes()
+                stage.width = userConfig.defaultWidth
+                stage.height = userConfig.defaultHeight
+
                 if (user != "") {
                     val rootPath = Paths.get(System.getProperty("user.home"))
 
