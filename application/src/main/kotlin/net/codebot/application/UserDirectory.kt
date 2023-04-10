@@ -38,6 +38,35 @@ fun getUserDirectory (user: String) {
         val tempFile = File(userPath.resolve(Paths.get(obj.get("name"))).toString())
         tempFile.writeText(getFile(user, "root/" + obj.get("name")).body)
     }
+
+    // grab config file
+    println("Downloading config file for user: " + user)
+    val configFile = File(rootPath.resolve(Paths.get(".Markdown/config.txt")).toString())
+    Files.deleteIfExists(configFile.toPath())
+    configFile.writeText(getFile(user, "config.txt").body)
+}
+
+fun getConfig(user : String) {
+    if (user.isEmpty()) {
+        println("Guest user requires no update")
+        return
+    }
+    // grab config file
+    println("Downloading config file for user: " + user)
+    val rootPath = Paths.get(System.getProperty("user.home"))
+    val configFile = File(rootPath.resolve(Paths.get(".Markdown/config.txt")).toString())
+    Files.deleteIfExists(configFile.toPath())
+    configFile.writeText(getFile(user, "config.txt").body)
+    println(getFile(user, "config.txt").body)
+}
+
+fun updateConfig(user: String, file: File) {
+    if (user.isEmpty()) {
+        println("Guest user requires no update")
+        return
+    }
+    println("Updating config file for user: " + user)
+    postFile(user, file.name, file.readText())
 }
 
 fun updateFile(user: String, path: String?) {

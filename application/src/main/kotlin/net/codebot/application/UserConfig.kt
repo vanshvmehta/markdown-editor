@@ -20,12 +20,12 @@ data class UserSetting(
 )
 
 //Check config file -> return user setting data class
-fun initConfig(): UserSetting {
+fun initConfig(user : String): UserSetting {
     var currSetting = UserSetting(
         "","",
         0.0, 0.0)
 
-    val configFile = File(getConfigPath())
+    val configFile = File(getConfigPath(user))
 
     //Check if Config File exists, if not, create a new default one
     if (!configFile.exists()) {
@@ -45,7 +45,7 @@ fun initConfig(): UserSetting {
         //Default Config
         updateConfig(UserSetting(
             "light", "user.home",
-            750.0, 450.0))
+            750.0, 450.0), user)
     }
 
     try {
@@ -65,8 +65,8 @@ fun initConfig(): UserSetting {
     return currSetting
 }
 
-private fun updateConfig(userSetting: UserSetting) {
-    val configFile = File(getConfigPath())
+private fun updateConfig(userSetting: UserSetting, user : String) {
+    val configFile = File(getConfigPath(user))
     println("Attempting to Update Config File: " + configFile.toString())
     try {
         println("Converting Properties to Json")
@@ -74,60 +74,61 @@ private fun updateConfig(userSetting: UserSetting) {
         val jsonString = json.encodeToString(userSetting)
         println("Writing Config")
         println(jsonString)
-        val file = File(getConfigPath())
+        val file = File(getConfigPath(user))
         val printWriter = PrintWriter(file) //Get where to write
         printWriter.write(jsonString)
         printWriter.close();
         println("Done Writing Config")
+        updateConfig(user, file)
     } catch (e: IOException) {
         e.printStackTrace()
     }
 }
-private fun getConfigPath(): String? {
+private fun getConfigPath(user : String): String? {
     val rootPath = Paths.get(System.getProperty("user.home"))
-    val partialPath = Paths.get(".MarkDown/config.txt")
+    val partialPath = Paths.get(".Markdown/config.txt")
     val resolvedPath: Path = rootPath.resolve(partialPath)
     return resolvedPath.toString()
 }
 
 public fun updateColorThemeConfig
-            (userSetting: UserSetting, newTheme: String) : UserSetting {
+            (userSetting: UserSetting, newTheme: String, user : String) : UserSetting {
     val newUserSetting =
         UserSetting(theme = newTheme,
             defaultFileLocation = userSetting.defaultFileLocation,
             defaultWidth = userSetting.defaultWidth,
             defaultHeight = userSetting.defaultHeight)
-    updateConfig(newUserSetting)
+    updateConfig(newUserSetting, user)
     return newUserSetting
 }
 public fun updateFileLocationConfig
-            (userSetting: UserSetting, newlocation: String) : UserSetting {
+            (userSetting: UserSetting, newlocation: String, user : String) : UserSetting {
     val newUserSetting =
         UserSetting(theme = userSetting.theme,
             defaultFileLocation = newlocation,
             defaultWidth = userSetting.defaultWidth,
             defaultHeight = userSetting.defaultHeight)
-    updateConfig(newUserSetting)
+    updateConfig(newUserSetting, user)
     return newUserSetting
 }
 
 public fun updateWidthConfig
-            (userSetting: UserSetting, newWidth: Double) : UserSetting {
+            (userSetting: UserSetting, newWidth: Double, user : String) : UserSetting {
     val newUserSetting =
         UserSetting(theme = userSetting.theme,
             defaultFileLocation = userSetting.defaultFileLocation,
             defaultWidth = newWidth,
             defaultHeight = userSetting.defaultHeight)
-    updateConfig(newUserSetting)
+    updateConfig(newUserSetting, user)
     return newUserSetting
 }
 public fun updateHeightConfig
-            (userSetting: UserSetting, newHeight: Double) : UserSetting {
+            (userSetting: UserSetting, newHeight: Double, user : String) : UserSetting {
     val newUserSetting =
         UserSetting(theme = userSetting.theme,
             defaultFileLocation = userSetting.defaultFileLocation,
             defaultWidth = userSetting.defaultWidth,
             defaultHeight = newHeight)
-    updateConfig(newUserSetting)
+    updateConfig(newUserSetting, user)
     return newUserSetting
 }
