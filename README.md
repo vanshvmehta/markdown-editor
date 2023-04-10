@@ -88,5 +88,7 @@ files inside this directory, the changes will be reflected in your remote direct
 save-as, open files outside of this directory. These changes won't affect your remote directory, and are just local to
 your computer.
 
-We also display the file directory of files you opened/save-as. You can click on '.txt' and '.md' files inside this
-tree to open them.
+We also display the file directory of files you opened/save-as in the left window. You can click on '.txt' and '.md'
+files inside this tree to open them.
+
+Enjoy! :)
