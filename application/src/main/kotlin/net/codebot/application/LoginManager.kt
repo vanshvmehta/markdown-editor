@@ -37,21 +37,23 @@ class LoginManager {
         grid.add(pwBox, 1, 2)
 
         // Defining sign in buttons and their placement
-        val guestBtn = Button("Sign in as Guest")
+        // val guestBtn = Button("Sign in as Guest")
         val userBtn = Button("Sign in")
         val hbBtn = HBox(10.0)
         hbBtn.alignment = Pos.BOTTOM_RIGHT
-        hbBtn.children.addAll(guestBtn, userBtn)
+        hbBtn.children.addAll(userBtn)
         grid.add(hbBtn, 1, 4)
 
         val actiontarget = Text()
         grid.add(actiontarget, 1, 6)
 
+        /*
         guestBtn.onAction = EventHandler {
             markdown.show()
             self.title = ""
             self.hide()
         }
+         */
 
         userBtn.onAction = EventHandler {
             actiontarget.setFill(Color.FIREBRICK)
