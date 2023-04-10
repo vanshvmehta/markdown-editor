@@ -572,7 +572,7 @@ class Forge
                             temp3, selectedFile.parentFile.absolutePath,true)
                         temp.left.getStyleClass().add("folder-view")
                         temp3.path2file = selectedFile.absolutePath
-                        userConfig = updateFileLocationConfig(userConfig, selectedFile.parentFile.absolutePath, user)
+                        //userConfig = updateFileLocationConfig(userConfig, selectedFile.parentFile.absolutePath)
                     }
 
                 } catch (e: FileNotFoundException) {
@@ -639,7 +639,7 @@ class Forge
                             val temp3 = tabPane.getSelectionModel().getSelectedItem().userData as FolderView.cur_File
                             if (temp3 != null) {
                                 temp3.path2file = file.absolutePath
-                                userConfig = updateFileLocationConfig(userConfig, file.parentFile.absolutePath, user)
+                                //userConfig = updateFileLocationConfig(userConfig, file.parentFile.absolutePath)
                             }
 
                         }
@@ -931,7 +931,19 @@ class Forge
                 setThemes()
                 stage.width = userConfig.defaultWidth
                 stage.height = userConfig.defaultHeight
+
+                if (user != "") {
+                    val rootPath = Paths.get(System.getProperty("user.home"))
+
+                    val partialPath = Paths.get(".MarkDown/", user, "/root")
+                    val resolvedPath: Path = rootPath.resolve(partialPath)
+                    println(resolvedPath.toString())
+                    userConfig = updateFileLocationConfig(userConfig, resolvedPath.toString(), user)
+                } else {
+                    userConfig = updateFileLocationConfig(userConfig, "user.home", user)
+                }
             }
+
 
 
             return topContainer
