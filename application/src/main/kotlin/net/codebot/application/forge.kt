@@ -938,10 +938,9 @@ class Forge
                     val partialPath = Paths.get(".MarkDown/", user, "/root")
                     val resolvedPath: Path = rootPath.resolve(partialPath)
                     println(resolvedPath.toString())
-                    userConfig = updateFileLocationConfig(userConfig, resolvedPath.toString())
+                    userConfig = updateFileLocationConfig(userConfig, resolvedPath.toString(), user)
                 } else {
-                    userConfig = updateFileLocationConfig(userConfig, "user.home")
-
+                    userConfig = updateFileLocationConfig(userConfig, "user.home", user)
                 }
             }
 
