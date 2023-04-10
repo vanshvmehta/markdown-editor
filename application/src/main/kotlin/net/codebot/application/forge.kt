@@ -917,7 +917,7 @@ class Forge
                 if (user != "") {
                     val rootPath = Paths.get(System.getProperty("user.home"))
 
-                    val partialPath = Paths.get(".MarkDown\\", user, "\\root")
+                    val partialPath = Paths.get(".MarkDown/", user, "/root")
                     val resolvedPath: Path = rootPath.resolve(partialPath)
                     println(resolvedPath.toString())
                     userConfig = updateFileLocationConfig(userConfig, resolvedPath.toString())
