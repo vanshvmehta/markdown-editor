@@ -122,6 +122,7 @@ class Forge
         var oldeditsize = "12.0"
         var oldcompfont = Font.getDefault().family
         var oldcompsize = "15.0"
+        border.userData = listOf(oldcompsize, oldcompfont)
         combo.minWidth = 60.0
         combo.maxWidth = 60.0
         val compilefont = ComboBox<String>()
@@ -234,6 +235,7 @@ class Forge
             if(newVal == "Edit Window"){
                 oldcompsize = combo.text
                 oldcompfont = compilefont.value
+                border.userData = listOf(oldcompsize, oldcompfont)
                 combo.text = text.font.size.toString()
                 compilefont.setValue(oldeditfont)
             }else{
@@ -266,7 +268,6 @@ class Forge
                 if (cur_theme == "darkMode.css"){
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
                             " font:" + combo.text + "px " + newVal + "; }"
-                    println("REACHED")
                 } else if (cur_theme == "nightBlue.css") {
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
                             " font:" + combo.text + "px " + newVal + "; }"
@@ -464,17 +465,18 @@ class Forge
                     if(temptab != null){
                         temptab = temptab as BorderPane
                         var tempview = temptab.right.lookup("WebView") as WebView
+                        var themelist = temptab.userData as List<*>
                         if (cur_theme == "darkMode.css") {
 
                             tempview.engine.setUserStyleSheetLocation("data:,body { color:#FFFFFF; background-color: #707070;" +
-                                    " font:" + oldcompsize + "px " + oldcompfont + "; }")
+                                    " font:" + themelist[0] + "px " + themelist[1] + "; }")
                         } else if (cur_theme == "nightBlue.css") {
                             tempview.engine.
                             userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
-                                    " font:" + oldcompsize + "px " + oldcompfont + "; }"
+                                    " font:" + themelist[0] + "px " + themelist[1] + "; }"
                         } else  {
                             tempview.engine.
-                            setUserStyleSheetLocation("data:,body {font:" + oldcompsize + "px " + oldcompfont + ";}")
+                            setUserStyleSheetLocation("data:,body {font:" + themelist[0] + "px " + themelist[1] + ";}")
                         }
                     }
 
@@ -609,7 +611,7 @@ class Forge
                 }
             }
 
-            //SaveAsFile function
+            //zAsFile function
             saveAsFile.onAction = EventHandler {
                 val savefilechooser = FileChooser()
 
@@ -673,7 +675,7 @@ class Forge
                     var cur_file: FolderView.cur_File = FolderView.cur_File()
                     val temp = Tab("New Tab", deepcopy( stage, false, cur_file) )
                     temp.userData = cur_file
-                    println("tab 2: " + temp.userData)
+                    //println("tab 2: " + temp.userData)
                     closeRequestOfMainTabPane(temp, tabPane)
                     tabPane.tabs.add(tabPane.tabs.size - 1,temp ) // Adding new tab before the "button" tab
                     tabPane.tabs.remove(tabPane.getSelectionModel().getSelectedItem())
@@ -687,6 +689,16 @@ class Forge
 
 
             }
+        }
+        new.onAction = EventHandler {
+            var cur_file: FolderView.cur_File = FolderView.cur_File()
+            val temp = Tab("New Tab", deepcopy( stage, false, cur_file) )
+            temp.userData = cur_file
+            //println("tab 2: " + temp.userData)
+            closeRequestOfMainTabPane(temp, tabPane)
+            tabPane.tabs.add(tabPane.tabs.size - 1,temp ) // Adding new tab before the "button" tab
+            tabPane.selectionModel
+                .select(tabPane.tabs.size - 2) // Se
         }
 
         signOut.onAction = EventHandler {
@@ -810,6 +822,7 @@ class Forge
             } else {
                 oldcompsize = combo.text
                 oldcompfont = compilefont.value
+                border.userData = listOf(oldcompsize, oldcompfont)
             }
         }
 
@@ -870,7 +883,7 @@ class Forge
 
         border.setOnKeyPressed {
             when (true) {
-                bold_combo.match(it) -> strikethrough.fire()
+                bold_combo.match(it) -> bold.fire()
                 italic_combo.match(it) -> italics.fire()
                 heading_combo.match(it) -> heading.fire()
                 strikethrough_combo.match(it) -> strikethrough.fire()
