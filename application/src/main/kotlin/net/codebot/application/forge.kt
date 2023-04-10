@@ -122,6 +122,7 @@ class Forge
         var oldeditsize = "12.0"
         var oldcompfont = Font.getDefault().family
         var oldcompsize = "15.0"
+        border.userData = listOf(oldcompsize, oldcompfont)
         combo.minWidth = 60.0
         combo.maxWidth = 60.0
         val compilefont = ComboBox<String>()
@@ -235,6 +236,7 @@ class Forge
             if(newVal == "Edit Window"){
                 oldcompsize = combo.text
                 oldcompfont = compilefont.value
+                border.userData = listOf(oldcompsize, oldcompfont)
                 combo.text = text.font.size.toString()
                 compilefont.setValue(oldeditfont)
             }else{
@@ -464,17 +466,18 @@ class Forge
                     if(temptab != null){
                         temptab = temptab as BorderPane
                         var tempview = temptab.right.lookup("WebView") as WebView
+                        var themelist = temptab.userData as List<*>
                         if (cur_theme == "darkMode.css") {
 
                             tempview.engine.setUserStyleSheetLocation("data:,body { color:#FFFFFF; background-color: #707070;" +
-                                    " font:" + oldcompsize + "px " + oldcompfont + "; }")
+                                    " font:" + themelist[0] + "px " + themelist[1] + "; }")
                         } else if (cur_theme == "nightBlue.css") {
                             tempview.engine.
                             userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
-                                    " font:" + oldcompsize + "px " + oldcompfont + "; }"
+                                    " font:" + themelist[0] + "px " + themelist[1] + "; }"
                         } else  {
                             tempview.engine.
-                            setUserStyleSheetLocation("data:,body {font:" + oldcompsize + "px " + oldcompfont + ";}")
+                            setUserStyleSheetLocation("data:,body {font:" + themelist[0] + "px " + themelist[1] + ";}")
                         }
                     }
 
@@ -812,6 +815,7 @@ class Forge
             } else {
                 oldcompsize = combo.text
                 oldcompfont = compilefont.value
+                border.userData = listOf(oldcompsize, oldcompfont)
             }
         }
 
