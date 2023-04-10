@@ -13,6 +13,29 @@ Architecture: // Link to archtecture.txt
 // To be filled in future sprints
 
 ## Releases
+// 4/10/2023
+// Version : 4.0.0
+- Added functionality to login for unique users
+- Added ability to save, delete, and browse files for unique users
+- Added functionality for settings to persist across users
+- Added more themes (Quiet light and Night Blue)
+- Added guest login
+- Added functionality for multiple tabs
+
+// 3/24/2023
+// Version : 3.0.0
+- Added keyboard shortcuts
+- Added functionality for: Undo, redo, cut, copy, paste
+- Implemented/separated: 'Save' and 'Save as'
+
+// 3/10/2023
+// Version : 2.0.0
+- Added themes (dark mode and light mode)
+- Added functionality to compile and display valid markdown text
+- Added file directory pane for files
+- Added data persistence for user settings
+
+
 // 2/16/2023
 // Version : 1.0.0
 Baseline functionality
