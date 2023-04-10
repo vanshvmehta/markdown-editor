@@ -267,7 +267,6 @@ class Forge
                 if (cur_theme == "darkMode.css"){
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #707070;" +
                             " font:" + combo.text + "px " + newVal + "; }"
-                    println("REACHED")
                 } else if (cur_theme == "nightBlue.css") {
                     webView.engine.userStyleSheetLocation = "data:,body { color:#FFFFFF; background-color: #203354;" +
                             " font:" + combo.text + "px " + newVal + "; }"
@@ -873,7 +872,7 @@ class Forge
 
         border.setOnKeyPressed {
             when (true) {
-                bold_combo.match(it) -> strikethrough.fire()
+                bold_combo.match(it) -> bold.fire()
                 italic_combo.match(it) -> italics.fire()
                 heading_combo.match(it) -> heading.fire()
                 strikethrough_combo.match(it) -> strikethrough.fire()
