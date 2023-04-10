@@ -610,7 +610,7 @@ class Forge
                 }
             }
 
-            //SaveAsFile function
+            //zAsFile function
             saveAsFile.onAction = EventHandler {
                 val savefilechooser = FileChooser()
 
@@ -674,7 +674,7 @@ class Forge
                     var cur_file: FolderView.cur_File = FolderView.cur_File()
                     val temp = Tab("New Tab", deepcopy( stage, false, cur_file) )
                     temp.userData = cur_file
-                    println("tab 2: " + temp.userData)
+                    //println("tab 2: " + temp.userData)
                     closeRequestOfMainTabPane(temp, tabPane)
                     tabPane.tabs.add(tabPane.tabs.size - 1,temp ) // Adding new tab before the "button" tab
                     tabPane.tabs.remove(tabPane.getSelectionModel().getSelectedItem())
@@ -688,6 +688,16 @@ class Forge
 
 
             }
+        }
+        new.onAction = EventHandler {
+            var cur_file: FolderView.cur_File = FolderView.cur_File()
+            val temp = Tab("New Tab", deepcopy( stage, false, cur_file) )
+            temp.userData = cur_file
+            //println("tab 2: " + temp.userData)
+            closeRequestOfMainTabPane(temp, tabPane)
+            tabPane.tabs.add(tabPane.tabs.size - 1,temp ) // Adding new tab before the "button" tab
+            tabPane.selectionModel
+                .select(tabPane.tabs.size - 2) // Se
         }
 
         signOut.onAction = EventHandler {
