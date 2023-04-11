@@ -61,6 +61,11 @@ You don't need to do anything to connect to our webservice, it should connect au
 When you first open the program, you will get a 'User Login' window. You can input a username and password that we
 verify to login. If you want to make a new account, then just put in a username (that hasn't already been taken) and
 your choice of a password. There is a 'Sign-out' button in 'File' that takes you back to the login manager.
+Some already created users are:
+Username: bob
+Password: cs346
+Username: jane
+Password: jane
 
 Logging in will set your settings to your previously saved settings (or default if you're a new user).
 It will also download a directory of the user's files (more on this later).
@@ -83,7 +88,7 @@ Themes can be accessed in View -> Themes -> (Theme of your choice).
 
 You can save, save-as, open files as normal using the buttons/shortcuts. When you attempt to select a file after you
 click these buttons, they will default to a special directory on your computer that we downloaded earlier. This
-directory is a copy of your remote one. If you save, save-as, or delete (using our 'Delete File' button) any of the
+directory is a copy of your remote one. If you save, save-as, or delete (using our buttons in the application) any of the
 files inside this directory, the changes will be reflected in your remote directory! You can also use the save,
 save-as, open files outside of this directory. These changes won't affect your remote directory, and are just local to
 your computer.
